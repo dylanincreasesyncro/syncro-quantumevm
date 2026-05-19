@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link rel="icon" type="image/png" sizes="512x512" href="/logo-syncroquantume.png">
+  <!-- LOGO OFICIAL Y ENLACES -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/logo-syncroquantume.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/logo-syncroquantume.png">
+    <meta property="og:image" content="/logo-syncroquantume.png">
+
+    <!-- ARCHIVO DE CONFIGURACIÓN (OBLIGATORIO) -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- COLORES PARA EL NAVEGADOR -->
+    <meta name="theme-color" content="#6A0DAD">
+    <meta name="msapplication-TileColor" content="#0A043C">
+
 <link rel="apple-touch-icon" sizes="512x512" href="/logo-syncroquantume.png">
 <meta property="og:image" content="/logo-syncroquantume.png">
 
@@ -814,5 +825,13 @@ window.addEventListener('load',()=>{
   }, 2200);
 });
 </script>
+  <!-- SERVICIO PARA QUE SE DESBLOQUEE EL BOTÓN -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js');
+    });
+}
+
 </body>
 </html>
