@@ -1,26 +1,21 @@
 {
-  "name": "Syncroquantume",
+  "name": "Syncro Quantum",
   "short_name": "Syncro",
-  "description": "Asistente Cuántico Inteligente",
+  "description": "Descripción de tu aplicación aquí",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A043C",
-  "theme_color": "#6A0DAD",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://i.ibb.co/4sY7wQH/logo-syncro.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
-      "src": "https://i.ibb.co/4sY7wQH/logo-syncro.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "lang": "es",
-  "orientation": "any"
+  ]
 }
