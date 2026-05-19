@@ -8,7 +8,7 @@
   "theme_color": "#6A0DAD",
   "icons": [
     {
-      https://raw.githubusercontent.com/davidsolisdev/logos/main/logo-syncroquantume.png 
+      "src": "/logo-syncroquantume.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
