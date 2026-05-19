@@ -8,7 +8,7 @@
   "theme_color": "#6A0DAD",
   "icons": [
     {
-      "src": "/logo-syncroquantume.png",
+      "src": "https://i.ibb.co/4sY7wQH/logo-syncro.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -16,10 +16,11 @@
   ],
   "screenshots": [
     {
-      "src": "/logo-syncroquantume.png",
+      "src": "https://i.ibb.co/4sY7wQH/logo-syncro.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide"
+      "type": "image/png"
     }
-  ]
+  ],
+  "lang": "es",
+  "orientation": "any"
 }
