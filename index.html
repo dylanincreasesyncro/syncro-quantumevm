@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- LOGO OFICIAL Y ENLACES -->
-    <link rel="icon" type="image/png" sizes="512x512" href="/logo-syncroquantume.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="/logo-syncroquantume.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="https://i.ibb.co/4sY7wQH/logo-syncro.png">
+<link rel="apple-touch-icon" sizes="512x512" href="https://i.ibb.co/4sY7wQH/logo-syncro.png">
+<meta property="og:image" content="https://i.ibb.co/4sY7wQH/logo-syncro.png">
+<meta name="theme-color" content="#6A0DAD">
+<script>
+let manifest = {
+  "name": "Syncroquantume",
+  "short_name": "Syncro",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A043C",
+  "theme_color": "#6A0DAD",
+  "icons": [{"src":"https://i.ibb.co/4sY7wQH/logo-syncro.png","sizes":"512x512","type":"image/png"}]
+};
+let blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+let url = URL.createObjectURL(blob);
+let link = document.createElement('link');
+link.rel = 'manifest';
+link.href = url;
+document.head.appendChild(link);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('https://cdn.jsdelivr.net/gh/dylanincreasesyncro/syncro-quantumevm@main/sw.js');
+</script>
     <meta property="og:image" content="/logo-syncroquantume.png">
 
     <!-- ARCHIVO DE CONFIGURACIÓN (OBLIGATORIO) -->
