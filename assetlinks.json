@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.syncroquantume.app",
+        "sha256_cert_fingerprints": ["09:DB:33:99:75:A6:A0:F4:FE:BC:14:B8:E0:10:04:0E:D5:EA:9D:A5:CF:3E:27:05:FA:3E:68:D1:57:A8:F8:BE"]
+      }
+    }]
