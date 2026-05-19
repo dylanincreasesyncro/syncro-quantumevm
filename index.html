@@ -1,737 +1,671 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Syncro Quantum</title>
-  <meta name="description" content="Tu asistente personal de IA adaptativo">
-  <meta name="theme-color" content="#7C3AED">
-  <meta name="msapplication-TileColor" content="#0A043C">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Syncro Q">
-  <meta property="og:title" content="Syncro Quantum">
-  <meta property="og:description" content="Tu asistente personal de IA adaptativo">
-  <meta property="og:image" content="/icons/icon-512x512.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyncroQuantume — La IA que te conoce mejor que tú mismo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --v: #7C3AED;
+  --c: #06B6D4;
+  --g: #10B981;
+  --p: #EC4899;
+  --bg: #04030A;
+  --bg2: #080614;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.07);
+  --text: #F0EEFF;
+  --muted: #6B7280;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;cursor:none}
 
-  <!-- MANIFEST — una sola vez -->
-  <link rel="manifest" href="/manifest.json">
+/* ── CURSOR ── */
+#cursor{position:fixed;width:12px;height:12px;background:var(--v);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:screen}
+#cursor-trail{position:fixed;width:36px;height:36px;border:1px solid rgba(124,58,237,0.4);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease}
+body:hover #cursor{opacity:1}
 
-  <!-- ICONOS -->
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+/* ── CANVAS PARTICLES ── */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
-  <!-- FUENTES -->
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+/* ── NOISE OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;z-index:1;pointer-events:none}
 
-  <!-- SERVICE WORKER — una sola vez -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;transition:all .4s}
+nav.scrolled{background:rgba(4,3,10,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:14px 48px}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:2px;background:linear-gradient(90deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{color:rgba(240,238,255,0.6);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.5px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:linear-gradient(135deg,var(--v),var(--p));color:#fff;padding:10px 24px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,0.4)}
 
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
-    .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;z-index:200;transition:opacity .4s ease,transform .4s ease}
-    .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
-    #app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;opacity:0;transition:opacity .4s ease}
-    #app.visible{opacity:1}
-    #header{flex-shrink:0;padding:12px 18px 10px;background:rgba(13,17,23,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;z-index:100}
-    .hlogo{display:flex;align-items:center;gap:8px}
-    .hlogo-sq{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff}
-    .hlogo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(90deg,#8B5CF6,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .hright{display:flex;align-items:center;gap:10px}
-    .live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:blink 2s ease-in-out infinite}
-    #pages{flex:1;overflow:hidden;position:relative}
-    .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-    .page::-webkit-scrollbar{display:none}
-    .page.active{opacity:1;pointer-events:all;transform:translateX(0)}
-    .page-inner{padding:18px 18px 100px}
-    #tabbar{flex-shrink:0;display:flex;background:rgba(13,17,23,.94);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:100}
-    .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:12px;transition:background .2s;position:relative}
-    .tab:active{background:rgba(255,255,255,.05)}
-    .tab-icon{font-size:20px;transition:transform .2s}
-    .tab-label{font-size:10px;font-weight:500;color:#64748B;transition:color .2s}
-    .tab.active .tab-label{font-weight:700}
-    .tab-badge{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#EF4444;border:1.5px solid #0D1117;display:none}
-    .tab-badge.show{display:block}
-    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px}
-    .glass{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.08);border-radius:18px;backdrop-filter:blur(14px)}
-    .sec-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
-    .ttl{font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.2;margin-bottom:7px}
-    .sub{font-size:13px;color:#94A3B8;line-height:1.7;margin-bottom:22px}
-    .frame{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5)}
-    .frame-bar{height:30px;background:#131b2e;display:flex;align-items:center;padding:0 12px;gap:5px;border-bottom:1px solid rgba(255,255,255,.06)}
-    .dot{width:9px;height:9px;border-radius:50%}
-    .screen-bg{background:#0f172a;padding:16px}
-    .btn-p{display:block;text-align:center;padding:14px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:transform .15s;width:100%}
-    .btn-p:active{transform:scale(.97)}
-    .btn-g{display:block;text-align:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,#10B981,#06B6D4);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(16,185,129,.35);transition:transform .15s;width:100%}
-    .btn-g:active{transform:scale(.97)}
-    .btn-out{display:block;text-align:center;padding:12px;border-radius:16px;background:transparent;color:#8B5CF6;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid rgba(124,58,237,.35);cursor:pointer;transition:background .2s;width:100%}
-    .input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px;color:#F8FAFC;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
-    .input:focus{border-color:#7C3AED}
-    .input::placeholder{color:#475569}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    @keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-    @keyframes scan{0%{top:0;opacity:1}80%{opacity:.8}100%{top:100%;opacity:0}}
-    @keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
-    @keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:.12}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
-    @keyframes glow{0%,100%{box-shadow:0 0 18px rgba(124,58,237,.3)}50%{box-shadow:0 0 36px rgba(124,58,237,.6)}}
-    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-    @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-    #update-banner{position:fixed;bottom:80px;left:12px;right:12px;background:linear-gradient(135deg,#7C3AED,#10B981);color:#fff;padding:13px 16px;border-radius:18px;z-index:9999;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(124,58,237,.5);font-size:13px;font-weight:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1)}
-    #update-banner.show{transform:translateY(0)}
-    .update-btn{background:rgba(255,255,255,.25);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
-    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#F8FAFC;padding:9px 20px;border-radius:24px;font-size:12px;font-weight:600;z-index:9998;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(124,58,237,.3);box-shadow:0 4px 18px rgba(0,0,0,.4)}
-    #toast.show{opacity:1}
-    #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-    #modal-overlay.open{opacity:1;pointer-events:all}
-    #modal{background:#0f172a;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;border:1px solid rgba(255,255,255,.1);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1)}
-    #modal-overlay.open #modal{transform:translateY(0)}
-  </style>
+/* ── HERO ── */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 48px 80px;z-index:2;overflow:hidden}
+.hero-glow{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.15) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-glow2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.1) 0%,transparent 70%);top:30%;right:10%;pointer-events:none}
+.hero-inner{text-align:center;position:relative;z-index:2;max-width:900px}
+
+/* ── ORBIT LOGO ── */
+.orbit-container{width:120px;height:120px;margin:0 auto 40px;position:relative}
+.orbit-sphere{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.orbit-core{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--c));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;box-shadow:0 0 40px rgba(124,58,237,0.6),0 0 80px rgba(124,58,237,0.2)}
+.orbit-ring{position:absolute;inset:0;border-radius:50%;border:1px solid transparent;animation:spin 4s linear infinite}
+.orbit-ring:nth-child(1){border-top-color:rgba(124,58,237,0.8);border-right-color:rgba(124,58,237,0.2)}
+.orbit-ring:nth-child(2){border-bottom-color:rgba(6,182,212,0.8);border-left-color:rgba(6,182,212,0.2);animation-duration:3s;animation-direction:reverse}
+.orbit-ring:nth-child(3){inset:8px;border-right-color:rgba(236,72,153,0.6);animation-duration:5s}
+.orbit-dot{position:absolute;width:6px;height:6px;border-radius:50%;top:-3px;left:50%;margin-left:-3px}
+.orbit-ring:nth-child(1) .orbit-dot{background:var(--v);box-shadow:0 0 8px var(--v)}
+.orbit-ring:nth-child(2) .orbit-dot{background:var(--c);box-shadow:0 0 8px var(--c)}
+.orbit-ring:nth-child(3) .orbit-dot{background:var(--p);box-shadow:0 0 8px var(--p)}
+
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:100px;padding:6px 16px;font-size:12px;color:rgba(167,139,250,0.9);font-weight:500;letter-spacing:.5px;margin-bottom:24px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);animation:pulse-dot 2s ease-in-out infinite}
+
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(42px,6vw,88px);font-weight:800;line-height:1.0;letter-spacing:-2px;margin-bottom:24px}
+.hero-title span{display:block}
+.hero-title .line1{color:var(--text)}
+.hero-title .line2{background:linear-gradient(90deg,var(--v),var(--c),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200%;animation:shimmer 4s linear infinite}
+.hero-title .line3{color:rgba(240,238,255,0.35);font-size:0.55em;letter-spacing:4px;text-transform:uppercase;font-weight:400;margin-top:8px}
+
+.hero-sub{font-size:18px;color:rgba(240,238,255,0.5);line-height:1.7;max-width:560px;margin:0 auto 48px;font-weight:300}
+
+.hero-ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.btn-primary{position:relative;padding:16px 40px;border-radius:100px;background:linear-gradient(135deg,var(--v),var(--p));color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:none;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--p),var(--v));opacity:0;transition:opacity .3s}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(124,58,237,0.45)}
+.btn-primary:hover::before{opacity:1}
+.btn-primary span{position:relative;z-index:1}
+.btn-secondary{padding:15px 36px;border-radius:100px;background:transparent;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,0.12);transition:all .2s;backdrop-filter:blur(8px)}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05);transform:translateY(-3px)}
+
+.hero-stats{display:flex;gap:48px;justify-content:center;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stat-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.hero-stat-divider{width:1px;background:var(--border);align-self:stretch}
+
+/* ── SCANNER LINE ── */
+.scanner{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--v),var(--c),transparent);animation:scan-hero 6s ease-in-out infinite;opacity:0.6;pointer-events:none}
+
+/* ── SECTION BASE ── */
+section{position:relative;z-index:2;padding:120px 48px}
+.section-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--c);margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:20px}
+.section-sub{font-size:17px;color:rgba(240,238,255,0.45);line-height:1.75;max-width:520px;font-weight:300}
+
+/* ── FEATURES ── */
+#features{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.features-header{text-align:center;margin-bottom:80px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:1200px;margin:0 auto}
+.feat-card{background:var(--card);border:1px solid var(--border);padding:40px 36px;position:relative;overflow:hidden;transition:all .4s;cursor:none}
+.feat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.06),transparent);opacity:0;transition:opacity .4s}
+.feat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--v),var(--c));transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.feat-card:hover{transform:translateY(-4px);border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)}
+.feat-card:hover::before{opacity:1}
+.feat-card:hover::after{transform:scaleX(1)}
+.feat-card:nth-child(2):hover::after{background:linear-gradient(90deg,var(--c),var(--g))}
+.feat-card:nth-child(3):hover::after{background:linear-gradient(90deg,var(--p),var(--v))}
+.feat-card:nth-child(4):hover::after{background:linear-gradient(90deg,var(--g),var(--c))}
+.feat-card:nth-child(5):hover::after{background:linear-gradient(90deg,var(--p),var(--c))}
+.feat-card:nth-child(6):hover::after{background:linear-gradient(90deg,var(--v),var(--p))}
+.feat-icon{width:48px;height:48px;margin-bottom:24px;position:relative}
+.feat-icon svg{width:100%;height:100%}
+.feat-num{position:absolute;top:36px;right:36px;font-family:'Syne',sans-serif;font-size:11px;color:rgba(255,255,255,0.08);font-weight:800;letter-spacing:2px}
+.feat-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:12px}
+.feat-desc{font-size:14px;color:rgba(240,238,255,0.45);line-height:1.75;font-weight:300}
+
+/* ── PHONE MOCKUP ── */
+#demo{background:var(--bg2)}
+.demo-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.demo-text .section-sub{margin-bottom:40px}
+.demo-features{display:flex;flex-direction:column;gap:20px}
+.demo-feat{display:flex;gap:16px;align-items:flex-start}
+.demo-feat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.demo-feat-title{font-weight:600;font-size:14px;margin-bottom:3px}
+.demo-feat-desc{font-size:13px;color:var(--muted);font-weight:300}
+.phone-wrap{display:flex;justify-content:center;position:relative}
+.phone{width:260px;height:520px;background:linear-gradient(145deg,#0d0b1a,#0a0812);border-radius:40px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.05),inset 0 0 0 1px rgba(255,255,255,0.03);animation:float-phone 4s ease-in-out infinite}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:6px;background:rgba(0,0,0,0.8);border-radius:0 0 8px 8px;z-index:10}
+.phone-screen{position:absolute;inset:12px;border-radius:30px;background:#080614;overflow:hidden}
+.phone-glow{position:absolute;inset:-20px;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,0.3),transparent 60%);pointer-events:none}
+.phone-content{padding:20px 14px;height:100%;display:flex;flex-direction:column}
+.phone-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.phone-logo{font-family:'Syne',sans-serif;font-size:10px;font-weight:800;background:linear-gradient(90deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.phone-dot{width:5px;height:5px;border-radius:50%;background:var(--g);box-shadow:0 0 6px var(--g);animation:pulse-dot 2s infinite}
+.phone-greeting{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px}
+.phone-greeting span{background:linear-gradient(90deg,var(--v),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.phone-sub{font-size:10px;color:var(--muted);margin-bottom:16px}
+.phone-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.phone-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px}
+.phone-card-num{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.phone-card-label{font-size:8px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.phone-chat{flex:1;display:flex;flex-direction:column;gap:8px}
+.phone-msg{padding:8px 10px;border-radius:10px;font-size:9px;line-height:1.5;max-width:85%}
+.phone-msg.user{background:linear-gradient(135deg,var(--v),rgba(124,58,237,0.6));align-self:flex-end;border-radius:10px 10px 2px 10px}
+.phone-msg.ai{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);align-self:flex-start;border-radius:2px 10px 10px 10px;color:rgba(240,238,255,0.8)}
+.phone-msg.ai strong{color:var(--g)}
+
+/* ── PRICING ── */
+#pricing{background:var(--bg)}
+.pricing-header{text-align:center;margin-bottom:80px}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:1100px;margin:0 auto}
+.price-card{background:var(--card);border:1px solid var(--border);padding:48px 40px;position:relative;overflow:hidden;transition:all .4s}
+.price-card:hover{transform:translateY(-8px)}
+.price-card.popular{border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.05)}
+.price-card.popular::before{content:'';position:absolute;inset:-1px;border-radius:0;background:linear-gradient(135deg,var(--v),var(--p),var(--c));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;pointer-events:none;animation:border-glow 3s ease-in-out infinite}
+.price-badge{position:absolute;top:20px;right:20px;background:linear-gradient(135deg,var(--v),var(--p));color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:100px;letter-spacing:.5px}
+.price-icon{font-size:32px;margin-bottom:20px}
+.price-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.price-desc{font-size:13px;color:var(--muted);margin-bottom:28px;font-weight:300}
+.price-amount{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1;margin-bottom:4px}
+.price-amount.c1{background:linear-gradient(135deg,var(--v),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.price-amount.c2{background:linear-gradient(135deg,var(--g),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.price-amount.c3{background:linear-gradient(135deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.price-period{font-size:12px;color:var(--muted);margin-bottom:32px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.price-features li{font-size:13px;color:rgba(240,238,255,0.6);display:flex;gap:10px;font-weight:300}
+.price-features li::before{content:'✓';color:var(--g);font-weight:700;flex-shrink:0}
+.price-btn{display:block;text-align:center;padding:14px;border-radius:100px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;text-decoration:none;transition:all .3s}
+.price-btn.b1{background:linear-gradient(135deg,var(--v),var(--p));color:#fff;box-shadow:0 8px 24px rgba(124,58,237,0.35)}
+.price-btn.b1:hover{box-shadow:0 12px 36px rgba(124,58,237,0.55);transform:translateY(-2px)}
+.price-btn.b2{background:linear-gradient(135deg,var(--g),var(--c));color:#fff;box-shadow:0 8px 24px rgba(16,185,129,0.3)}
+.price-btn.b2:hover{box-shadow:0 12px 36px rgba(16,185,129,0.5);transform:translateY(-2px)}
+.price-btn.b3{background:linear-gradient(135deg,#F59E0B,#EF4444);color:#fff;box-shadow:0 8px 24px rgba(245,158,11,0.3)}
+.price-btn.b3:hover{box-shadow:0 12px 36px rgba(245,158,11,0.5);transform:translateY(-2px)}
+
+/* ── TESTIMONIALS ── */
+#testimonials{background:var(--bg2);overflow:hidden}
+.testimonials-header{text-align:center;margin-bottom:64px}
+.testi-track{display:flex;gap:24px;animation:scroll-testi 30s linear infinite;width:max-content}
+.testi-track:hover{animation-play-state:paused}
+.testi-card{background:var(--card);border:1px solid var(--border);border-radius:0;padding:32px 28px;width:340px;flex-shrink:0}
+.testi-stars{color:#F59E0B;font-size:13px;margin-bottom:14px;letter-spacing:2px}
+.testi-text{font-size:14px;color:rgba(240,238,255,0.65);line-height:1.75;font-style:italic;margin-bottom:20px;font-weight:300}
+.testi-author{display:flex;gap:10px;align-items:center}
+.testi-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800}
+.testi-name{font-size:13px;font-weight:600}
+.testi-plan{font-size:11px;color:var(--muted)}
+
+/* ── CTA ── */
+#cta{background:var(--bg);text-align:center;padding:160px 48px}
+.cta-inner{max-width:700px;margin:0 auto;position:relative}
+.cta-glow{position:absolute;width:600px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(124,58,237,0.2),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cta-title{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:24px;position:relative;z-index:1}
+.cta-sub{font-size:18px;color:rgba(240,238,255,0.45);margin-bottom:48px;font-weight:300;position:relative;z-index:1}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.store-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 24px;text-decoration:none;color:var(--text);transition:all .3s}
+.store-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);transform:translateY(-3px)}
+.store-btn-sub{font-size:10px;color:var(--muted)}
+.store-btn-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+
+/* ── FOOTER ── */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:48px;position:relative;z-index:2}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:2px;background:linear-gradient(90deg,var(--v),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-copy{font-size:12px;color:var(--muted)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* ── KEYFRAMES ── */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse-dot{0%,100%{opacity:1;box-shadow:0 0 6px var(--g)}50%{opacity:.4;box-shadow:0 0 2px var(--g)}}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes scan-hero{0%{top:-2px;opacity:0}10%{opacity:.6}90%{opacity:.6}100%{top:100%;opacity:0}}
+@keyframes float-phone{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-16px) rotate(1deg)}}
+@keyframes border-glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes scroll-testi{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes count-up{from{opacity:0}to{opacity:1}}
+
+/* ── CIRCUIT LINES ── */
+.circuit{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:.15}
+.circuit svg{width:100%;height:100%}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:16px 24px}
+  nav.scrolled{padding:12px 24px}
+  .nav-links{display:none}
+  section{padding:80px 24px}
+  #hero{padding:100px 24px 60px}
+  .features-grid{grid-template-columns:1fr}
+  .demo-inner{grid-template-columns:1fr;text-align:center}
+  .phone-wrap{margin-top:48px}
+  .pricing-grid{grid-template-columns:1fr}
+  .hero-stat-divider{display:none}
+  .hero-stats{gap:24px}
+  footer{padding:32px 24px}
+  .footer-inner{flex-direction:column;text-align:center}
+}
+</style>
 </head>
 <body>
 
-<!-- ══════ SPLASH SCREEN ══════ -->
-<div id="splash" class="screen" style="background:#0D1117">
-  <div style="position:absolute;width:400px;height:400px;background:rgba(124,58,237,.15);border-radius:50%;filter:blur(90px);pointer-events:none"></div>
-  <div style="animation:float 3s ease-in-out infinite;position:relative;z-index:1;margin-bottom:24px">
-    <svg width="220" height="85" viewBox="0 0 220 85" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
-      <defs>
-        <linearGradient id="sg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
-        <filter id="sgf"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="url(#sg1)" stroke-width="1" opacity=".55" style="animation:spin 4s linear infinite;transform-origin:30px 30px"/>
-      <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="#EC4899" stroke-width=".7" opacity=".4" transform="rotate(60,30,30)" style="animation:spinR 5s linear infinite;transform-origin:30px 30px"/>
-      <circle cx="30" cy="30" r="10" fill="none" stroke="url(#sg1)" stroke-width="2" filter="url(#sgf)"/>
-      <line x1="36" y1="36" x2="42" y2="42" stroke="url(#sg1)" stroke-width="2" stroke-linecap="round" filter="url(#sgf)"/>
-      <circle cx="30" cy="30" r="3" fill="url(#sg1)" filter="url(#sgf)" style="animation:pulse 2s ease-in-out infinite"/>
-      <circle r="1.8" fill="#EC4899"><animateMotion dur="3s" repeatCount="indefinite" path="M30,30 m-20,0 a20,8 0 1,1 0,0.01"/></circle>
-      <circle r="1.4" fill="#06B6D4"><animateMotion dur="4.5s" repeatCount="indefinite" path="M30,30 m0,-8 a20,8 60 1,1 0,0.01"/></circle>
-      <text x="56" y="25" font-family="Syne,sans-serif" font-weight="800" font-size="20" fill="url(#sg1)" filter="url(#sgf)" letter-spacing="2">SYNCRO</text>
-      <line x1="56" y1="31" x2="208" y2="31" stroke="#EC4899" stroke-width=".6" opacity=".5"/>
-      <text x="56" y="46" font-family="Syne,sans-serif" font-weight="700" font-size="13" fill="#F8FAFC" letter-spacing="6" opacity=".9">QUANTUME</text>
-      <text x="56" y="58" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" letter-spacing="1.5">ADAPTIVE INTELLIGENCE</text>
-    </svg>
-  </div>
-  <div style="display:flex;gap:5px;margin-top:8px">
-    <div style="width:6px;height:6px;border-radius:50%;background:#7C3AED;animation:wave 1.2s ease-in-out infinite"></div>
-    <div style="width:6px;height:6px;border-radius:50%;background:#8B5CF6;animation:wave 1.2s ease-in-out .15s infinite"></div>
-    <div style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:wave 1.2s ease-in-out .3s infinite"></div>
-  </div>
-  <div style="font-size:12px;color:#475569;margin-top:10px">Iniciando tu asistente…</div>
-</div>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+<canvas id="particles"></canvas>
 
-<!-- ══════ LOGIN SCREEN ══════ -->
-<div id="login-screen" class="screen hidden" style="background:#0D1117;overflow-y:auto">
-  <div style="position:absolute;width:350px;height:350px;background:rgba(124,58,237,.13);border-radius:50%;filter:blur(80px);top:-100px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
-  <div style="width:100%;max-width:360px;position:relative;z-index:1">
-    <div style="text-align:center;margin-bottom:32px">
-      <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px;animation:glow 3s ease-in-out infinite">🧬</div>
-      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px">Bienvenido de vuelta</div>
-      <div style="font-size:13px;color:#94A3B8">Inicia sesión en tu asistente cuántico</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
-      <div>
-        <div style="font-size:12px;color:#94A3B8;margin-bottom:7px;font-weight:500">Correo electrónico</div>
-        <input id="login-email" class="input" type="email" placeholder="tu@correo.com" autocomplete="email"/>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:7px">
-          <span style="font-size:12px;color:#94A3B8;font-weight:500">Contraseña</span>
-          <span style="font-size:12px;color:#7C3AED;cursor:pointer" onclick="showToast('📧 Revisa tu correo para restablecer')">¿Olvidaste?</span>
-        </div>
-        <div style="position:relative">
-          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px"/>
-          <button onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;cursor:pointer;font-size:16px" id="eye-btn">👁️</button>
-        </div>
-      </div>
-    </div>
-    <div id="login-error" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:#EF4444;margin-bottom:14px;text-align:center"></div>
-    <button onclick="doLogin()" id="login-btn" style="width:100%;padding:15px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);margin-bottom:14px;transition:transform .15s">
-      Iniciar sesión →
-    </button>
-    <div style="text-align:center;font-size:12px;color:#94A3B8;margin-bottom:20px">
-      ¿No tienes cuenta? <span style="color:#7C3AED;cursor:pointer;font-weight:600" onclick="goTab('planes');hideLogin()">Empieza gratis →</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
-      <span style="font-size:11px;color:#475569">o continúa con</span>
-      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
-    </div>
-    <button onclick="googleLogin()" style="width:100%;padding:13px;border-radius:14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);color:#F8FAFC;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Inter',sans-serif;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
-      Continuar con Google
-    </button>
-    <div style="text-align:center;margin-top:20px;font-size:11px;color:#475569">🔐 Acceso seguro · Sin venta de datos · Cancela cuando quieras</div>
-  </div>
-</div>
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div class="nav-logo">SYNCROQUANTUME</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="app.html">Precios</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+  </ul>
+  <a href="app.html" class="nav-cta">Empezar gratis →</a>
+</nav>
 
-<!-- ══════ MAIN APP ══════ -->
-<div id="app">
-  <div id="header">
-    <div class="hlogo">
-      <div class="hlogo-sq">SQ</div>
-      <span class="hlogo-name">Syncro Quantum</span>
-    </div>
-    <div class="hright">
-      <div class="live-dot"></div>
-      <span id="user-chip" style="font-size:11px;color:#94A3B8;background:rgba(255,255,255,.05);padding:4px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08)"></span>
-      <button style="background:none;border:none;color:#94A3B8;font-size:18px;cursor:pointer" onclick="openModal('settings')">⚙️</button>
-    </div>
-  </div>
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="scanner"></div>
 
-  <div id="pages">
-
-    <!-- PAGE: INICIO -->
-    <div class="page active" id="page-home">
-      <div class="page-inner">
-        <div style="text-align:center;padding:16px 0 24px;position:relative">
-          <div style="position:absolute;width:280px;height:280px;background:rgba(124,58,237,.1);border-radius:50%;filter:blur(70px);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
-          <div style="margin-bottom:16px;animation:float 4s ease-in-out infinite;position:relative;z-index:1">
-            <svg width="220" height="80" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
-              <defs><linearGradient id="hl1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#10B981"/></linearGradient><filter id="hgf"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-              <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="url(#hl1)" stroke-width="1" opacity=".55" style="animation:spin 4s linear infinite;transform-origin:30px 30px"/>
-              <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="#EC4899" stroke-width=".7" opacity=".4" transform="rotate(60,30,30)" style="animation:spinR 5s linear infinite;transform-origin:30px 30px"/>
-              <circle cx="30" cy="30" r="10" fill="none" stroke="url(#hl1)" stroke-width="2" filter="url(#hgf)"/>
-              <line x1="36" y1="36" x2="42" y2="42" stroke="url(#hl1)" stroke-width="2" stroke-linecap="round" filter="url(#hgf)"/>
-              <circle cx="30" cy="30" r="3" fill="url(#hl1)" filter="url(#hgf)" style="animation:pulse 2s ease-in-out infinite"/>
-              <circle r="1.8" fill="#EC4899"><animateMotion dur="3s" repeatCount="indefinite" path="M30,30 m-20,0 a20,8 0 1,1 0,0.01"/></circle>
-              <circle r="1.4" fill="#06B6D4"><animateMotion dur="4.5s" repeatCount="indefinite" path="M30,30 m0,-8 a20,8 60 1,1 0,0.01"/></circle>
-              <text x="56" y="24" font-family="Syne,sans-serif" font-weight="800" font-size="19" fill="url(#hl1)" filter="url(#hgf)" letter-spacing="2">SYNCRO</text>
-              <line x1="56" y1="30" x2="208" y2="30" stroke="#EC4899" stroke-width=".6" opacity=".5"/>
-              <text x="56" y="44" font-family="Syne,sans-serif" font-weight="700" font-size="12" fill="#F8FAFC" letter-spacing="6" opacity=".9">QUANTUME</text>
-              <text x="56" y="56" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" letter-spacing="1.5">ADAPTIVE INTELLIGENCE</text>
-            </svg>
-          </div>
-          <div id="home-greeting" style="font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.15;margin-bottom:9px;position:relative;z-index:1">Tu vida,<br><span style="background:linear-gradient(90deg,#7C3AED,#EC4899,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">optimizada por IA.</span></div>
-          <p style="font-size:13px;color:#94A3B8;line-height:1.75;margin-bottom:18px;max-width:270px;margin-left:auto;margin-right:auto;position:relative;z-index:1">La IA que te conoce mejor que tú mismo. Predice, actúa y mejora — antes de que lo necesites.</p>
-          <div style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1">
-            <button class="btn-p" onclick="goTab('demos')">🎬 Ver demos en vivo</button>
-            <button class="btn-out" onclick="goTab('planes')">Ver planes y precios →</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px">
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#7C3AED,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">12K+</div><div style="font-size:10px;color:#64748B;margin-top:2px">Usuarios</div></div>
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#F59E0B,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div><div style="font-size:10px;color:#64748B;margin-top:2px">Rating</div></div>
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">98%</div><div style="font-size:10px;color:#64748B;margin-top:2px">Renuevan</div></div>
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Lo que hace por ti</div>
-        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px">
-          <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧠</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Coach IA 24/7</div><div style="font-size:12px;color:#94A3B8">Responde con contexto real</div></div><span style="color:#64748B;font-size:16px">›</span></div>
-          <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(236,72,153,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Lectura biométrica</div><div style="font-size:12px;color:#94A3B8">Detecta estrés por cámara</div></div><span style="color:#64748B;font-size:16px">›</span></div>
-          <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔮</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Predicción cuántica</div><div style="font-size:12px;color:#94A3B8">Tu estado, hora por hora</div></div><span style="color:#64748B;font-size:16px">›</span></div>
-          <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(99,179,237,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌙</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Arquitecto de Sueños</div><div style="font-size:12px;color:#94A3B8">Tu día preparado al despertar</div></div><span style="color:#64748B;font-size:16px">›</span></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:9px">
-          <div class="card" style="padding:13px 14px"><div style="color:#F59E0B;font-size:11px;margin-bottom:5px">★★★★★</div><div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:8px;font-style:italic">"Me dice lo que necesito escuchar antes de que yo lo sepa."</div><div style="display:flex;gap:8px;align-items:center"><div style="width:26px;height:26px;border-radius:50%;background:rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#10B981">MS</div><div style="font-size:11px;color:#64748B">Mariana S. · Plan Creativa</div></div></div>
-          <div class="card" style="padding:13px 14px"><div style="color:#F59E0B;font-size:11px;margin-bottom:5px">★★★★★</div><div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:8px;font-style:italic">"Ahorré más en el primer mes que en todo el año anterior."</div><div style="display:flex;gap:8px;align-items:center"><div style="width:26px;height:26px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#F59E0B">JR</div><div style="font-size:11px;color:#64748B">Jorge R. · Plan Inteligente</div></div></div>
-        </div>
+  <div class="hero-inner">
+    <div class="orbit-container reveal">
+      <div class="orbit-sphere">
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="orbit-core">SQ</div>
       </div>
     </div>
 
-    <!-- PAGE: DEMOS -->
-    <div class="page" id="page-demos">
-      <div class="page-inner">
-        <div style="margin-bottom:20px">
-          <div class="sec-tag" style="background:rgba(124,58,237,.12);color:#8B5CF6;border:1px solid rgba(124,58,237,.25)">Demos en vivo</div>
-          <div class="ttl">Míralo funcionar<br><span style="background:linear-gradient(90deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en tiempo real</span></div>
-          <div class="sub">Toca cada demo para expandirla y ver la animación en vivo.</div>
+    <div class="hero-badge reveal reveal-delay-1">
+      <div class="hero-badge-dot"></div>
+      IA Adaptativa · Disponible ahora
+    </div>
+
+    <h1 class="hero-title reveal reveal-delay-2">
+      <span class="line1">La IA que te</span>
+      <span class="line2">conoce mejor</span>
+      <span class="line3">que tú mismo</span>
+    </h1>
+
+    <p class="hero-sub reveal reveal-delay-3">Predice tu estado, optimiza tu día y actúa antes de que lo necesites. El asistente personal más avanzado del mundo.</p>
+
+    <div class="hero-ctas reveal reveal-delay-4">
+      <a href="app.html" class="btn-primary"><span>🚀 Empezar gratis — 3 días</span></a>
+      <a href="#demo" class="btn-secondary">Ver cómo funciona</a>
+    </div>
+
+    <div class="hero-stats reveal reveal-delay-4">
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-target="12000">0</div>
+        <div class="hero-stat-label">Usuarios activos</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">4.9★</div>
+        <div class="hero-stat-label">Rating promedio</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-target="98">0</div>
+        <div class="hero-stat-label">% Renuevan</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-target="3">0</div>
+        <div class="hero-stat-label">Planes disponibles</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+  <div class="features-header reveal">
+    <div class="section-tag">Capacidades</div>
+    <h2 class="section-title">Tecnología que<br>no tiene comparación</h2>
+    <p class="section-sub" style="margin:0 auto">Seis módulos de inteligencia que trabajan juntos en tiempo real para transformar cómo vives.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat-card reveal">
+      <div class="feat-num">01</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="10" stroke="#7C3AED" stroke-width="1.5"/><circle cx="24" cy="24" r="18" stroke="rgba(124,58,237,0.3)" stroke-width="1" stroke-dasharray="4 4"/><circle cx="24" cy="24" r="4" fill="#7C3AED"/><line x1="30" y1="30" x2="40" y2="40" stroke="#06B6D4" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="feat-title">Coach IA 24/7</div>
+      <div class="feat-desc">Conversaciones con contexto completo de tu vida. Recuerda, aprende y adapta cada respuesta a tu situación real.</div>
+    </div>
+    <div class="feat-card reveal reveal-delay-1">
+      <div class="feat-num">02</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="4" stroke="#EC4899" stroke-width="1.5"/><circle cx="18" cy="20" r="4" stroke="#EC4899" stroke-width="1.5"/><circle cx="30" cy="20" r="4" stroke="#EC4899" stroke-width="1.5"/><path d="M14 34 Q24 40 34 34" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" fill="none"/><line x1="8" y1="8" x2="8" y2="40" stroke="rgba(236,72,153,0.2)" stroke-width="8"/><line x1="8" y1="20" x2="40" y2="20" stroke="rgba(236,72,153,0.15)" stroke-width="1" stroke-dasharray="2 2"/></svg>
+      </div>
+      <div class="feat-title">Lectura Biométrica</div>
+      <div class="feat-desc">Detecta estrés, energía y emoción mediante análisis facial en 15 segundos. Sin wearables, solo tu cámara.</div>
+    </div>
+    <div class="feat-card reveal reveal-delay-2">
+      <div class="feat-num">03</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><polyline points="6,36 16,22 24,28 34,12 42,18" stroke="#06B6D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="34" cy="12" r="3" fill="#06B6D4"/><line x1="34" y1="12" x2="34" y2="40" stroke="rgba(6,182,212,0.2)" stroke-width="1" stroke-dasharray="3 3"/><rect x="6" y="36" width="36" height="1" fill="rgba(255,255,255,0.1)"/></svg>
+      </div>
+      <div class="feat-title">Predicción Cuántica</div>
+      <div class="feat-desc">Anticipa caídas de energía, picos de productividad y tu estado óptimo hora por hora con 94% de precisión.</div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-num">04</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="12" r="6" stroke="#10B981" stroke-width="1.5"/><circle cx="10" cy="36" r="5" stroke="#10B981" stroke-width="1.5"/><circle cx="38" cy="36" r="5" stroke="#10B981" stroke-width="1.5"/><line x1="24" y1="18" x2="10" y2="31" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/><line x1="24" y1="18" x2="38" y2="31" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/><line x1="15" y1="36" x2="33" y2="36" stroke="rgba(16,185,129,0.2)" stroke-width="1.5"/></svg>
+      </div>
+      <div class="feat-title">Entorno Inteligente</div>
+      <div class="feat-desc">Integración con Google Home, Alexa y Apple Home. Ajusta tu espacio automáticamente según tu estado.</div>
+    </div>
+    <div class="feat-card reveal reveal-delay-1">
+      <div class="feat-num">05</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 6 L28 18 L40 18 L30 26 L34 38 L24 30 L14 38 L18 26 L8 18 L20 18 Z" stroke="#F59E0B" stroke-width="1.5" stroke-linejoin="round" fill="rgba(245,158,11,0.08)"/></svg>
+      </div>
+      <div class="feat-title">Briefing Matutino</div>
+      <div class="feat-desc">Cada mañana recibe tu día optimizado: ventanas de foco, energía esperada, alertas y prioridades calculadas.</div>
+    </div>
+    <div class="feat-card reveal reveal-delay-2">
+      <div class="feat-num">06</div>
+      <div class="feat-icon">
+        <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="14" width="32" height="24" rx="3" stroke="#7C3AED" stroke-width="1.5"/><circle cx="24" cy="26" r="6" stroke="#EC4899" stroke-width="1.5"/><circle cx="24" cy="26" r="2" fill="#EC4899"/><line x1="8" y1="20" x2="40" y2="20" stroke="rgba(124,58,237,0.3)" stroke-width="1"/></svg>
+      </div>
+      <div class="feat-title">Control Financiero</div>
+      <div class="feat-desc">Monitoreo de gastos en tiempo real, alertas de pagos y plan de compras optimizado para tu estilo de vida.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DEMO ── -->
+<section id="demo">
+  <div class="demo-inner">
+    <div class="demo-text">
+      <div class="section-tag reveal">Producto</div>
+      <h2 class="section-title reveal reveal-delay-1">Diseñado para<br>impresionar</h2>
+      <p class="section-sub reveal reveal-delay-2">Una experiencia que se siente como el futuro. Fluida, inteligente y completamente tuya.</p>
+      <div class="demo-features">
+        <div class="demo-feat reveal reveal-delay-2">
+          <div class="demo-feat-icon" style="background:rgba(124,58,237,0.12)">🧠</div>
+          <div><div class="demo-feat-title">Memoria adaptativa</div><div class="demo-feat-desc">Recuerda cada conversación y contexto para respuestas cada vez más precisas</div></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d1')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#7C3AED,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💬</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Coach IA en vivo</div><div style="font-size:11px;color:#94A3B8">Conversación real con contexto</div></div><span id="d1-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div>
-            <div id="d1" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 14px 14px">
-                <div class="frame"><div class="frame-bar"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FFBD2E"></div><div class="dot" style="background:#28C840"></div><span style="margin-left:8px;font-size:10px;color:#94A3B8">Coach · En línea</span><span style="margin-left:auto;width:6px;height:6px;border-radius:50%;background:#10B981;animation:blink 2s ease-in-out infinite"></span></div>
-                <div class="screen-bg" style="display:flex;flex-direction:column;gap:10px;min-height:220px;padding:14px 12px">
-                  <div style="text-align:center;font-size:9px;color:#475569">Hoy · 15:42</div>
-                  <div style="display:flex;justify-content:flex-end"><div style="background:linear-gradient(135deg,#7C3AED,#8B5CF6);color:#fff;padding:9px 13px;border-radius:14px 14px 4px 14px;max-width:78%;font-size:12px;line-height:1.5">Estoy muy cansado y tengo reunión en 1h. ¿Qué hago?</div></div>
-                  <div style="display:flex;gap:7px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🤖</div><div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:4px 14px 14px 14px;padding:10px 12px;max-width:82%;font-size:12px;line-height:1.6;color:#E2E8F0"><strong style="color:#10B981">Fatiga media.</strong> 58 min antes de la reunión.<br><br>✅ <strong>Ahora:</strong> Cierra el PC, 10 min al balcón.<br>⚡ <strong>+15 min:</strong> Come algo ligero.<br>🎯 <strong>Reunión:</strong> Llegas al 78% — suficiente.</div></div>
-                  <div style="display:flex;gap:7px;flex-wrap:wrap"><div style="padding:5px 11px;border-radius:18px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#10B981;font-size:10px;font-weight:600">✓ Descanso 10 min</div><div style="padding:5px 11px;border-radius:18px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);color:#8B5CF6;font-size:10px;font-weight:600">📅 Ver agenda</div></div>
-                </div></div>
-              </div>
+        <div class="demo-feat reveal reveal-delay-3">
+          <div class="demo-feat-icon" style="background:rgba(6,182,212,0.12)">⚡</div>
+          <div><div class="demo-feat-title">Respuesta instantánea</div><div class="demo-feat-desc">Latencia menor a 200ms gracias a procesamiento en edge</div></div>
+        </div>
+        <div class="demo-feat reveal reveal-delay-4">
+          <div class="demo-feat-icon" style="background:rgba(16,185,129,0.12)">🔐</div>
+          <div><div class="demo-feat-title">Privacidad total</div><div class="demo-feat-desc">Cifrado E2E. Tus datos nunca salen de tu dispositivo sin permiso</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-wrap reveal reveal-delay-2">
+      <div class="phone-glow"></div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-content">
+            <div class="phone-header">
+              <div class="phone-logo">SYNCROQUANTUME</div>
+              <div class="phone-dot"></div>
             </div>
-          </div>
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d2')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#EC4899,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Lectura biométrica</div><div style="font-size:11px;color:#94A3B8">Escaneo facial en 15 segundos</div></div><span id="d2-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div>
-            <div id="d2" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 14px 14px">
-                <div class="frame"><div class="frame-bar"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FFBD2E"></div><div class="dot" style="background:#28C840"></div><span style="margin-left:8px;font-size:10px;color:#94A3B8">Escaneo biométrico</span></div>
-                <div class="screen-bg" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px">
-                  <div style="position:relative;width:120px;height:120px">
-                    <div style="position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(16,185,129,.3);animation:pulse 2s ease-in-out infinite"></div>
-                    <div style="position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(16,185,129,.4);animation:pulse 2s ease-in-out .4s infinite"></div>
-                    <div style="position:absolute;inset:0;border-radius:50%;background:linear-gradient(145deg,#1a2035,#0f172a);border:2.5px solid #10B981;overflow:hidden">
-                      <svg width="100%" height="100%" viewBox="0 0 120 120"><circle cx="60" cy="55" r="34" fill="#3d2b1f" opacity=".55"/><ellipse cx="49" cy="49" rx="6.5" ry="7.5" fill="#1a1035"/><ellipse cx="71" cy="49" rx="6.5" ry="7.5" fill="#1a1035"/><circle cx="49" cy="49" r="4" fill="#2d1b8a" opacity=".8"/><circle cx="71" cy="49" r="4" fill="#2d1b8a" opacity=".8"/><circle cx="50.5" cy="47.5" r="1.5" fill="#fff"/><circle cx="72.5" cy="47.5" r="1.5" fill="#fff"/><path d="M56 61 Q60 67 64 61" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" stroke-linecap="round"/><path d="M50 72 Q60 79 70 72" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" stroke-linecap="round"/></svg>
-                      <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#10B981,transparent);animation:scan 2.5s ease-in-out infinite"></div>
-                    </div>
-                    <div style="position:absolute;top:3px;left:3px;width:12px;height:12px;border-top:2px solid #10B981;border-left:2px solid #10B981;border-radius:2px 0 0 0"></div>
-                    <div style="position:absolute;top:3px;right:3px;width:12px;height:12px;border-top:2px solid #10B981;border-right:2px solid #10B981;border-radius:0 2px 0 0"></div>
-                    <div style="position:absolute;bottom:3px;left:3px;width:12px;height:12px;border-bottom:2px solid #10B981;border-left:2px solid #10B981;border-radius:0 0 0 2px"></div>
-                    <div style="position:absolute;bottom:3px;right:3px;width:12px;height:12px;border-bottom:2px solid #10B981;border-right:2px solid #10B981;border-radius:0 0 2px 0"></div>
-                  </div>
-                  <div style="font-size:11px;color:#10B981;font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:5px;height:5px;border-radius:50%;background:#10B981;animation:blink 1s ease-in-out infinite"></span>Leyendo señales…</div>
-                  <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px">
-                    <div class="card" style="padding:9px 11px"><div style="font-size:9px;color:#94A3B8;margin-bottom:3px">Estrés</div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#F59E0B">4<span style="font-size:10px;color:#94A3B8">/10</span></div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:9px;color:#94A3B8;margin-bottom:3px">Energía</div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#10B981">7<span style="font-size:10px;color:#94A3B8">/10</span></div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:9px;color:#94A3B8;margin-bottom:3px">Emoción</div><div style="font-size:12px;font-weight:700;color:#8B5CF6;margin-top:2px">Concentrado</div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:9px;color:#94A3B8;margin-bottom:3px">Confianza</div><div style="font-size:12px;font-weight:700;color:#06B6D4;margin-top:2px">94%</div></div>
-                  </div>
-                </div></div>
-              </div>
+            <div class="phone-greeting">Buenos días, <span>Dylan</span></div>
+            <div class="phone-sub">Tu energía hoy: 84% · Óptimo para crear</div>
+            <div class="phone-cards">
+              <div class="phone-card"><div class="phone-card-num" style="color:#7C3AED">84%</div><div class="phone-card-label">Energía</div></div>
+              <div class="phone-card"><div class="phone-card-num" style="color:#EC4899">3/10</div><div class="phone-card-label">Estrés</div></div>
+              <div class="phone-card"><div class="phone-card-num" style="color:#10B981">94%</div><div class="phone-card-label">Foco</div></div>
+              <div class="phone-card"><div class="phone-card-num" style="color:#06B6D4">7.8h</div><div class="phone-card-label">Sueño</div></div>
             </div>
-          </div>
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d3')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#7C3AED,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔮</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Predicción cuántica</div><div style="font-size:11px;color:#94A3B8">Gráfico de energía hora a hora</div></div><span id="d3-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div>
-            <div id="d3" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 14px 14px">
-                <div class="frame"><div class="frame-bar"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FFBD2E"></div><div class="dot" style="background:#28C840"></div><span style="margin-left:8px;font-size:10px;color:#94A3B8">Predicción · Hoy</span></div>
-                <div class="screen-bg" style="padding:14px">
-                  <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:9px 12px;margin-bottom:12px;display:flex;gap:8px;font-size:11px;color:rgba(255,255,255,.7);line-height:1.5"><span>⚠️</span><div><strong style="color:#F59E0B">Alerta 16:30h:</strong> Caída de energía en ~40 min.</div></div>
-                  <svg width="100%" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
-                    <defs><linearGradient id="pcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".3"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
-                    <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="60" x2="300" y2="60" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-                    <path d="M14,24 L58,30 L100,18 L142,32 L184,27 L184,88 L14,88 Z" fill="url(#pcg)"/>
-                    <path d="M14,24 L58,30 L100,18 L142,32 L184,27" fill="none" stroke="#7C3AED" stroke-width="2.5" style="animation:lineGrow 1.5s ease forwards;stroke-dasharray:300;stroke-dashoffset:300"/>
-                    <path d="M184,27 L232,58 L280,76" fill="none" stroke="#EC4899" stroke-width="2" stroke-dasharray="5 4" opacity=".8"/>
-                    <line x1="184" y1="12" x2="184" y2="88" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <rect x="170" y="5" width="28" height="11" rx="3" fill="#F59E0B"/>
-                    <text x="184" y="13" font-size="6.5" fill="#000" text-anchor="middle" font-weight="700">AHORA</text>
-                    <circle cx="184" cy="27" r="4.5" fill="#F59E0B" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="14" y="97" font-size="7.5" fill="#475569" text-anchor="middle">9h</text><text x="58" y="97" font-size="7.5" fill="#475569" text-anchor="middle">11h</text><text x="100" y="97" font-size="7.5" fill="#475569" text-anchor="middle">13h</text><text x="142" y="97" font-size="7.5" fill="#475569" text-anchor="middle">15h</text><text x="184" y="97" font-size="7.5" fill="#F59E0B" text-anchor="middle" font-weight="600">16h</text><text x="232" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">17h</text><text x="280" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">18h</text>
-                  </svg>
-                </div></div>
-              </div>
-            </div>
-          </div>
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d4')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#10B981,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏠</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Entorno inteligente</div><div style="font-size:11px;color:#94A3B8">Comandos para Google Home y Alexa</div></div><span id="d4-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div>
-            <div id="d4" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:8px">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                  <div class="card" style="padding:11px"><div style="font-size:18px;margin-bottom:4px">💡</div><div style="font-size:12px;font-weight:600;margin-bottom:1px">Iluminación</div><div style="font-size:10px;color:#94A3B8">Blanco cálido 70%</div></div>
-                  <div class="card" style="padding:11px"><div style="font-size:18px;margin-bottom:4px">🎵</div><div style="font-size:12px;font-weight:600;margin-bottom:1px">Música</div><div style="font-size:10px;color:#94A3B8">Lo-fi ≤80 BPM</div></div>
-                  <div class="card" style="padding:11px"><div style="font-size:18px;margin-bottom:4px">🌡️</div><div style="font-size:12px;font-weight:600;margin-bottom:1px">Temperatura</div><div style="font-size:10px;color:#94A3B8">20°C · Fresco</div></div>
-                  <div class="card" style="padding:11px"><div style="font-size:18px;margin-bottom:4px">🔕</div><div style="font-size:12px;font-weight:600;margin-bottom:1px">Notificaciones</div><div style="font-size:10px;color:#94A3B8">Silencio 90 min</div></div>
-                </div>
-                <button onclick="copyEnvCmds(this)" style="padding:10px;border-radius:12px;background:linear-gradient(135deg,#10B981,#06B6D4);color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif">Copiar comandos de voz</button>
-              </div>
-            </div>
-          </div>
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d5')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#63B3ED,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🌅</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Briefing matutino</div><div style="font-size:11px;color:#94A3B8">Tu día preparado al despertar</div></div><span id="d5-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div>
-            <div id="d5" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 14px 14px">
-                <div style="background:linear-gradient(160deg,#080d1a,#0a1020);border-radius:16px;padding:16px;border:1px solid rgba(99,179,237,.2);display:flex;flex-direction:column;gap:10px">
-                  <div style="text-align:center"><div style="font-size:24px;margin-bottom:4px">🌅</div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">Buenos días, Carlos</div><div style="font-size:11px;color:#94A3B8">07:15 am</div></div>
-                  <div class="card" style="padding:10px;background:rgba(99,179,237,.08);border-color:rgba(99,179,237,.2)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600">🌙 Sueño</span><span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#63B3ED">86%</span></div><div style="font-size:10px;color:#94A3B8">7.5h · 2 ciclos REM · Óptimo</div></div>
-                  <div style="display:flex;flex-direction:column;gap:5px">
-                    <div style="padding:7px 10px;background:rgba(16,185,129,.08);border-radius:9px;border-left:2px solid #10B981;font-size:11px"><strong>09:00–11:30</strong> · <span style="color:#94A3B8">Mejor ventana de foco.</span></div>
-                    <div style="padding:7px 10px;background:rgba(245,158,11,.07);border-radius:9px;border-left:2px solid #F59E0B;font-size:11px"><strong>15:00–16:30</strong> · <span style="color:#94A3B8">Baja de energía. Sin reuniones.</span></div>
-                  </div>
-                </div>
-              </div>
+            <div class="phone-chat">
+              <div class="phone-msg user">¿Cuándo es mi mejor momento para una reunión importante?</div>
+              <div class="phone-msg ai"><strong>Ventana óptima: 10:00–11:30h</strong><br>Tu foco histórico en esa franja es 94%. Energía descendente después de las 15h — evita reuniones ahí.</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- PAGE: PLANES -->
-    <div class="page" id="page-planes">
-      <div class="page-inner">
-        <div style="margin-bottom:20px">
-          <div class="sec-tag" style="background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.25)">Elige tu perfil</div>
-          <div class="ttl">3 planes, <span style="background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">un universo</span></div>
-          <div class="sub">Todos incluyen <strong style="color:#10B981">3 días gratis</strong>. Sin tarjeta.</div>
-        </div>
-        <div class="card" style="padding:20px;margin-bottom:12px;border-color:rgba(236,72,153,.3);position:relative;overflow:hidden">
-          <div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(236,72,153,.1);border-radius:50%;filter:blur(40px)"></div>
-          <div style="position:absolute;top:14px;right:14px;font-size:9px;font-weight:700;padding:2px 9px;border-radius:18px;background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.35);color:#EC4899;text-transform:uppercase;letter-spacing:.8px">Popular</div>
-          <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#7C3AED,#EC4899);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px">🎨</div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Creativa</div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Tu estudio creativo inteligente</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:13px">
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#EC4899;font-weight:700">✓</span>Gestión de proyectos con IA</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#EC4899;font-weight:700">✓</span>Captura ilimitada de ideas</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#EC4899;font-weight:700">✓</span>Seguimiento de ingresos</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#EC4899;font-weight:700">✓</span>Pitch para conseguir clientes</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:13px"><span style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$89</span><span style="font-size:11px;color:#64748B">/mes · 3 días gratis</span></div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#7C3AED,#EC4899)">Empezar gratis →</a>
-        </div>
-        <div class="card" style="padding:20px;margin-bottom:12px;border-color:rgba(16,185,129,.3);position:relative;overflow:hidden">
-          <div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(16,185,129,.08);border-radius:50%;filter:blur(40px)"></div>
-          <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#10B981,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px">🌿</div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Bienestar</div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Vive en armonía, sin estrés</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:13px">
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#10B981;font-weight:700">✓</span>Monitor sueño, estrés y energía</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#10B981;font-weight:700">✓</span>Meditaciones y guías diarias</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#10B981;font-weight:700">✓</span>Plan de alimentación consciente</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#10B981;font-weight:700">✓</span>Programa personalizado 30 días</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:13px"><span style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$79</span><span style="font-size:11px;color:#64748B">/mes · 3 días gratis</span></div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="btn-g">Empezar gratis →</a>
-        </div>
-        <div class="card" style="padding:20px;border-color:rgba(245,158,11,.3);position:relative;overflow:hidden">
-          <div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(245,158,11,.07);border-radius:50%;filter:blur(40px)"></div>
-          <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px">⚡</div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Inteligente</div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Cada peso, en su lugar</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:13px">
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#F59E0B;font-weight:700">✓</span>Control de gastos en tiempo real</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#F59E0B;font-weight:700">✓</span>Alertas de pagos y ofertas</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#F59E0B;font-weight:700">✓</span>Plan de compras optimizado</div>
-            <div style="display:flex;gap:7px;font-size:12px;color:#CBD5E1"><span style="color:#F59E0B;font-weight:700">✓</span>Plan financiero 30 días</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:13px"><span style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$49</span><span style="font-size:11px;color:#64748B">/mes · 3 días gratis</span></div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#F59E0B,#EF4444);box-shadow:0 5px 16px rgba(245,158,11,.35)">Empezar gratis →</a>
-        </div>
-        <div style="text-align:center;margin-top:14px;font-size:11px;color:#475569">💙 PayPal · 🔵 Mercado Pago · Cancela cuando quieras</div>
-      </div>
-    </div>
-
-    <!-- PAGE: REFERIDOS -->
-    <div class="page" id="page-referidos">
-      <div class="page-inner">
-        <div style="text-align:center;margin-bottom:22px">
-          <div style="width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;animation:glow 3s ease-in-out infinite">🎁</div>
-          <div class="sec-tag" style="background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.25)">Programa de referidos</div>
-          <div class="ttl">Invita · Gana · <span style="background:linear-gradient(90deg,#7C3AED,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Comparte</span></div>
-          <div class="sub">Invita a un amigo y <strong style="color:#10B981">ambos ganan 1 mes gratis</strong>. Sin límite.</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
-          <div class="card" style="padding:14px;text-align:center;border-color:rgba(124,58,237,.25)"><div style="font-size:22px;margin-bottom:5px">🙋</div><div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#8B5CF6;margin-bottom:1px">Tú ganas</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">1 mes</div><div style="font-size:10px;color:#64748B;margin-top:2px">gratis por amigo</div></div>
-          <div class="card" style="padding:14px;text-align:center;border-color:rgba(16,185,129,.25)"><div style="font-size:22px;margin-bottom:5px">🤝</div><div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#10B981;margin-bottom:1px">Tu amigo gana</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">1 mes</div><div style="font-size:10px;color:#64748B;margin-top:2px">al suscribirse</div></div>
-        </div>
-        <div class="card" style="padding:14px;margin-bottom:12px">
-          <div style="font-size:10px;color:#64748B;margin-bottom:7px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Tu link de referido</div>
-          <div style="display:flex;gap:7px;align-items:center">
-            <div style="flex:1;font-family:monospace;font-size:11px;color:#8B5CF6;background:rgba(124,58,237,.08);padding:8px 10px;border-radius:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(124,58,237,.18)">syncroquantume.app/ref/TU-CODIGO</div>
-            <button id="refCopyBtn" onclick="copyRef()" style="background:linear-gradient(135deg,#7C3AED,#10B981);color:#fff;border:none;border-radius:10px;padding:8px 13px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif">Copiar</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-          <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.28);color:#25D366;font-weight:700;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">💬 WhatsApp</button>
-          <button onclick="shareOther(this)" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:13px;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.28);color:#EC4899;font-weight:700;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">📸 Compartir</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: PERFIL -->
-    <div class="page" id="page-perfil">
-      <div class="page-inner">
-        <div style="text-align:center;padding:16px 0 22px">
-          <div style="position:relative;display:inline-block;margin-bottom:14px">
-            <div id="profile-avatar" style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:32px;animation:glow 3s ease-in-out infinite">😊</div>
-            <div style="position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:#10B981;border:2px solid #0D1117;display:flex;align-items:center;justify-content:center;font-size:10px">✓</div>
-          </div>
-          <div id="profile-name" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:3px">Mi perfil</div>
-          <div id="profile-email-display" style="font-size:12px;color:#94A3B8;margin-bottom:8px"></div>
-          <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28);font-size:12px;font-weight:600;color:#10B981"><span style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:blink 2s infinite"></span>Activo</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:20px">
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#8B5CF6">14</div><div style="font-size:10px;color:#64748B;margin-top:2px">Días activo</div></div>
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#10B981">94%</div><div style="font-size:10px;color:#64748B;margin-top:2px">Precisión IA</div></div>
-          <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#F59E0B">7</div><div style="font-size:10px;color:#64748B;margin-top:2px">Patrones</div></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('planes')"><div style="width:36px;height:36px;border-radius:11px;background:rgba(124,58,237,.12);display:flex;align-items:center;justify-content:center;font-size:16px">💎</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Mi plan</div><div style="font-size:11px;color:#94A3B8">Plan Creativa · $89/mes</div></div><span style="color:#64748B;font-size:14px">›</span></div>
-          <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('referidos')"><div style="width:36px;height:36px;border-radius:11px;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;font-size:16px">🎁</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Invitar amigos</div><div style="font-size:11px;color:#94A3B8">Gana 1 mes gratis por cada uno</div></div><span style="color:#64748B;font-size:14px">›</span></div>
-          <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="installApp()"><div style="width:36px;height:36px;border-radius:11px;background:rgba(6,182,212,.1);display:flex;align-items:center;justify-content:center;font-size:16px">📲</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Instalar app</div><div style="font-size:11px;color:#94A3B8">Añadir a pantalla de inicio</div></div><span style="color:#64748B;font-size:14px">›</span></div>
-          <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="openModal('privacy')"><div style="width:36px;height:36px;border-radius:11px;background:rgba(99,179,237,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🔐</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Privacidad</div><div style="font-size:11px;color:#94A3B8">Cifrado total · Sin venta de datos</div></div><span style="color:#64748B;font-size:14px">›</span></div>
-          <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="doLogout()"><div style="width:36px;height:36px;border-radius:11px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🚪</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#EF4444">Cerrar sesión</div><div style="font-size:11px;color:#94A3B8">Salir de tu cuenta</div></div><span style="color:#64748B;font-size:14px">›</span></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end pages -->
-
-  <!-- TAB BAR -->
-  <div id="tabbar">
-    <button class="tab active" onclick="goTab('home')" id="tab-home"><span class="tab-icon">🏠</span><span class="tab-label" style="color:#8B5CF6">Inicio</span></button>
-    <button class="tab" onclick="goTab('demos')" id="tab-demos"><span class="tab-icon">🎬</span><span class="tab-label">Demos</span></button>
-    <button class="tab" onclick="goTab('planes')" id="tab-planes"><span class="tab-icon">💎</span><span class="tab-label">Planes</span></button>
-    <button class="tab" onclick="goTab('referidos')" id="tab-referidos"><span class="tab-icon">🎁</span><span class="tab-label">Invitar</span><div class="tab-badge show" id="badge-referidos"></div></button>
-    <button class="tab" onclick="goTab('perfil')" id="tab-perfil"><span class="tab-icon">👤</span><span class="tab-label">Perfil</span></button>
   </div>
+</section>
 
-</div><!-- end app -->
+<!-- ── PRICING ── -->
+<section id="pricing">
+  <div class="pricing-header reveal">
+    <div class="section-tag">Inversión</div>
+    <h2 class="section-title">Elige tu universo</h2>
+    <p class="section-sub" style="margin:0 auto">3 días gratis en todos los planes. Sin tarjeta de crédito. Cancela cuando quieras.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card popular reveal">
+      <div class="price-badge">⚡ Popular</div>
+      <div class="price-icon">🎨</div>
+      <div class="price-name">Creativa</div>
+      <div class="price-desc">Tu estudio de creación inteligente</div>
+      <div class="price-amount c1">$89</div>
+      <div class="price-period">/mes · 3 días gratis sin tarjeta</div>
+      <ul class="price-features">
+        <li>Coach IA con memoria ilimitada</li>
+        <li>Gestión de proyectos con IA</li>
+        <li>Captura ilimitada de ideas</li>
+        <li>Seguimiento de ingresos</li>
+        <li>Pitch para conseguir clientes</li>
+      </ul>
+      <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="price-btn b1">Empezar gratis →</a>
+    </div>
+    <div class="price-card reveal reveal-delay-1">
+      <div class="price-icon">🌿</div>
+      <div class="price-name">Bienestar</div>
+      <div class="price-desc">Vive en armonía, sin estrés</div>
+      <div class="price-amount c2">$79</div>
+      <div class="price-period">/mes · 3 días gratis sin tarjeta</div>
+      <ul class="price-features">
+        <li>Monitor sueño, estrés y energía</li>
+        <li>Lectura biométrica diaria</li>
+        <li>Meditaciones y guías personalizadas</li>
+        <li>Plan de alimentación consciente</li>
+        <li>Programa personalizado 30 días</li>
+      </ul>
+      <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="price-btn b2">Empezar gratis →</a>
+    </div>
+    <div class="price-card reveal reveal-delay-2">
+      <div class="price-icon">⚡</div>
+      <div class="price-name">Inteligente</div>
+      <div class="price-desc">Cada peso, en su lugar exacto</div>
+      <div class="price-amount c3">$49</div>
+      <div class="price-period">/mes · 3 días gratis sin tarjeta</div>
+      <ul class="price-features">
+        <li>Control de gastos en tiempo real</li>
+        <li>Alertas de pagos y ofertas</li>
+        <li>Plan de compras optimizado</li>
+        <li>Predicción de gastos futuros</li>
+        <li>Plan financiero 30 días</li>
+      </ul>
+      <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="price-btn b3">Empezar gratis →</a>
+    </div>
+  </div>
+</section>
 
-<!-- UPDATE BANNER -->
-<div id="update-banner">
-  <span>✨ Nueva versión disponible</span>
-  <button class="update-btn" onclick="applyUpdate()">Actualizar ahora</button>
-</div>
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials" style="padding-left:0;padding-right:0">
+  <div class="testimonials-header reveal" style="padding:0 48px">
+    <div class="section-tag">Comunidad</div>
+    <h2 class="section-title">Lo que dicen los que<br>ya viven en el futuro</h2>
+  </div>
+  <div style="overflow:hidden">
+    <div class="testi-track">
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Me dice lo que necesito escuchar antes de que yo lo sepa. Llevo 6 meses y no puedo imaginar mi vida sin Syncro."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(16,185,129,0.15);color:#10B981">MS</div><div><div class="testi-name">Mariana S.</div><div class="testi-plan">Plan Creativa · México</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Ahorré más en el primer mes que en todo el año anterior. El control financiero es simplemente mágico."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(245,158,11,0.15);color:#F59E0B">JR</div><div><div class="testi-name">Jorge R.</div><div class="testi-plan">Plan Inteligente · Colombia</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"La predicción de energía es increíblemente precisa. Reorganicé toda mi agenda y mi productividad se triplicó."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(124,58,237,0.15);color:#8B5CF6">AL</div><div><div class="testi-name">Andrea L.</div><div class="testi-plan">Plan Creativa · Argentina</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Dormía mal hace años. Con el monitor de sueño y las guías de Bienestar, ahora duermo 7.5h de calidad cada noche."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(6,182,212,0.15);color:#06B6D4">CM</div><div><div class="testi-name">Carlos M.</div><div class="testi-plan">Plan Bienestar · España</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Como freelancer, el módulo creativo cambió todo. Capturó 47 ideas en mi primer semana y convirtió 3 en proyectos reales."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(236,72,153,0.15);color:#EC4899">VP</div><div><div class="testi-name">Valentina P.</div><div class="testi-plan">Plan Creativa · Chile</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"El briefing matutino es como tener un asistente personal de lujo. Sé exactamente qué hacer cada hora del día."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(16,185,129,0.15);color:#10B981">RG</div><div><div class="testi-name">Roberto G.</div><div class="testi-plan">Plan Inteligente · Perú</div></div></div></div>
+      <!-- duplicar para loop infinito -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Me dice lo que necesito escuchar antes de que yo lo sepa. Llevo 6 meses y no puedo imaginar mi vida sin Syncro."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(16,185,129,0.15);color:#10B981">MS</div><div><div class="testi-name">Mariana S.</div><div class="testi-plan">Plan Creativa · México</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Ahorré más en el primer mes que en todo el año anterior. El control financiero es simplemente mágico."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(245,158,11,0.15);color:#F59E0B">JR</div><div><div class="testi-name">Jorge R.</div><div class="testi-plan">Plan Inteligente · Colombia</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"La predicción de energía es increíblemente precisa. Reorganicé toda mi agenda y mi productividad se triplicó."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(124,58,237,0.15);color:#8B5CF6">AL</div><div><div class="testi-name">Andrea L.</div><div class="testi-plan">Plan Creativa · Argentina</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Dormía mal hace años. Con el monitor de sueño y las guías de Bienestar, ahora duermo 7.5h de calidad cada noche."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(6,182,212,0.15);color:#06B6D4">CM</div><div><div class="testi-name">Carlos M.</div><div class="testi-plan">Plan Bienestar · España</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"Como freelancer, el módulo creativo cambió todo. Capturó 47 ideas en mi primer semana y convirtió 3 en proyectos reales."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(236,72,153,0.15);color:#EC4899">VP</div><div><div class="testi-name">Valentina P.</div><div class="testi-plan">Plan Creativa · Chile</div></div></div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-text">"El briefing matutino es como tener un asistente personal de lujo. Sé exactamente qué hacer cada hora del día."</div><div class="testi-author"><div class="testi-avatar" style="background:rgba(16,185,129,0.15);color:#10B981">RG</div><div><div class="testi-name">Roberto G.</div><div class="testi-plan">Plan Inteligente · Perú</div></div></div></div>
+    </div>
+  </div>
+</section>
 
-<!-- TOAST -->
-<div id="toast"></div>
+<!-- ── CTA ── -->
+<section id="cta">
+  <div class="cta-inner">
+    <div class="cta-glow"></div>
+    <h2 class="cta-title reveal">El futuro<br><span style="background:linear-gradient(90deg,var(--v),var(--c),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent">ya está aquí</span></h2>
+    <p class="cta-sub reveal reveal-delay-1">Únete a 12,000 personas que ya viven optimizadas por IA. Comienza hoy, gratis.</p>
+    <div class="cta-btns reveal reveal-delay-2">
+      <a href="app.html" class="btn-primary"><span>🚀 Empezar gratis ahora</span></a>
+      <a href="https://play.google.com/store" target="_blank" class="store-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.37.21.8.22 1.2.01l12.72-7.34-2.82-2.82-11.1 10.15zM.5 1.4C.18 1.76 0 2.3 0 3v18c0 .7.18 1.24.5 1.6l.08.08 10.08-10.08v-.24L.58 1.32.5 1.4zM20.37 10.26l-2.72-1.57-3.15 3.15 3.15 3.15 2.74-1.58c.78-.45.78-1.7-.02-2.15zM4.38.24L17.1 7.58l-2.82 2.82L4.2.26l.18-.02z"/></svg>
+        <div><div class="store-btn-sub">Disponible en</div><div class="store-btn-name">Google Play</div></div>
+      </a>
+    </div>
+  </div>
+</section>
 
-<!-- MODAL -->
-<div id="modal-overlay" onclick="closeModal(event)">
-  <div id="modal"><div id="modal-content"></div></div>
-</div>
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">SYNCROQUANTUME</div>
+    <div class="footer-copy">© 2025 SyncroQuantume · Todos los derechos reservados</div>
+    <div class="footer-links">
+      <a href="#">Privacidad</a>
+      <a href="#">Términos</a>
+      <a href="#">Contacto</a>
+    </div>
+  </div>
+</footer>
 
 <script>
-// ── AUTH ──
-const ADMIN_EMAIL = 'dylanincrease@gmail.com';
-const ADMIN_PASS  = 'syncro2025';
-let currentUser = null;
-let passVisible  = false;
-
-function togglePass(){
-  const inp = document.getElementById('login-pass');
-  const btn = document.getElementById('eye-btn');
-  passVisible = !passVisible;
-  inp.type = passVisible ? 'text' : 'password';
-  btn.textContent = passVisible ? '🙈' : '👁️';
-}
-
-function doLogin(){
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('login-pass').value;
-  const errEl = document.getElementById('login-error');
-  const btn   = document.getElementById('login-btn');
-  errEl.style.display = 'none';
-  if(!email || !pass){ showLoginError('Por favor completa todos los campos'); return; }
-  if(!/\S+@\S+\.\S+/.test(email)){ showLoginError('El correo no es válido'); return; }
-  btn.textContent = 'Verificando…';
-  btn.style.opacity = '.7';
-  setTimeout(()=>{
-    if(email === ADMIN_EMAIL.toLowerCase() && pass === ADMIN_PASS){
-      loginSuccess({ email, name:'Dylan', role:'admin' });
-    } else if(email !== ADMIN_EMAIL.toLowerCase() && pass.length >= 6){
-      loginSuccess({ email, name: email.split('@')[0], role:'user' });
-    } else {
-      btn.textContent = 'Iniciar sesión →';
-      btn.style.opacity = '1';
-      showLoginError('Correo o contraseña incorrectos');
-      document.getElementById('login-screen').style.animation = 'shake .4s ease';
-      setTimeout(()=>document.getElementById('login-screen').style.animation='',400);
-    }
-  }, 900);
-}
-
-function showLoginError(msg){
-  const el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function loginSuccess(user){
-  currentUser = user;
-  try{ localStorage.setItem('sq_user', JSON.stringify(user)); }catch(e){}
-  document.getElementById('login-btn').textContent = 'Iniciando…';
-  setTimeout(()=>{ hideLogin(); showApp(user); }, 400);
-}
-
-function showApp(user){
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('user-chip').textContent = user.name ? user.name.substring(0,2).toUpperCase() : '?';
-  document.getElementById('profile-name').textContent = user.name || 'Mi perfil';
-  document.getElementById('profile-email-display').textContent = user.email;
-  if(user.role === 'admin'){
-    document.getElementById('home-greeting').innerHTML = 'Hola, Dylan 👋<br><span style="background:linear-gradient(90deg,#7C3AED,#EC4899,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Tu asistente cuántico.</span>';
-  }
-  goTab('home');
-}
-
-function hideLogin(){
-  const ls = document.getElementById('login-screen');
-  ls.classList.add('hidden');
-  ls.style.display = 'none';
-}
-
-function googleLogin(){ showToast('🔄 Autenticación con Google próximamente'); }
-
-function doLogout(){
-  try{ localStorage.removeItem('sq_user'); }catch(e){}
-  currentUser = null;
-  document.getElementById('app').classList.remove('visible');
-  const ls = document.getElementById('login-screen');
-  ls.style.display = 'flex';
-  ls.classList.remove('hidden');
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-pass').value = '';
-  document.getElementById('login-error').style.display = 'none';
-  document.getElementById('login-btn').textContent = 'Iniciar sesión →';
-  document.getElementById('login-btn').style.opacity = '1';
-  showToast('👋 Sesión cerrada');
-}
-
-document.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+// ── CUSTOM CURSOR ──
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx=0,my=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+  setTimeout(()=>{ trail.style.left=mx+'px'; trail.style.top=my+'px'; },80);
+});
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ cursor.style.width='24px'; cursor.style.height='24px'; cursor.style.background='var(--p)'; });
+  el.addEventListener('mouseleave',()=>{ cursor.style.width='12px'; cursor.style.height='12px'; cursor.style.background='var(--v)'; });
 });
 
-// ── NAVEGACIÓN ──
-let currentTab = 'home';
-const tabAccents = {home:'#8B5CF6',demos:'#EC4899',planes:'#10B981',referidos:'#F59E0B',perfil:'#06B6D4'};
+// ── PARTICLES ──
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize',resize);
 
-function goTab(tab){
-  if(tab === currentTab) return;
-  document.getElementById('page-'+currentTab).classList.remove('active');
-  const ct = document.getElementById('tab-'+currentTab);
-  if(ct){ ct.classList.remove('active'); ct.querySelector('.tab-label').style.color=''; }
-  currentTab = tab;
-  const np = document.getElementById('page-'+tab);
-  np.classList.add('active'); np.scrollTop=0;
-  const nt = document.getElementById('tab-'+tab);
-  if(nt){
-    nt.classList.add('active');
-    nt.querySelector('.tab-label').style.color = tabAccents[tab]||'#8B5CF6';
-    nt.querySelector('.tab-icon').style.transform = 'scale(1.18)';
-    setTimeout(()=>nt.querySelector('.tab-icon').style.transform='scale(1)',220);
+class Particle {
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W; this.y=Math.random()*H;
+    this.vx=(Math.random()-.5)*.3; this.vy=(Math.random()-.5)*.3;
+    this.r=Math.random()*1.5+.5;
+    this.color=['rgba(124,58,237,','rgba(6,182,212,','rgba(16,185,129,','rgba(236,72,153,'][Math.floor(Math.random()*4)];
+    this.alpha=Math.random()*.6+.2;
   }
-  const badge = document.getElementById('badge-'+tab);
-  if(badge) badge.classList.remove('show');
-}
-
-// Swipe
-let tx=0, ty=0;
-const tabs = ['home','demos','planes','referidos','perfil'];
-document.getElementById('pages').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
-document.getElementById('pages').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
-    const i=tabs.indexOf(currentTab);
-    if(dx<0&&i<tabs.length-1) goTab(tabs[i+1]);
-    else if(dx>0&&i>0) goTab(tabs[i-1]);
+  update(){
+    this.x+=this.vx; this.y+=this.vy;
+    if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset();
   }
-},{passive:true});
-
-// ── DEMOS ACCORDION ──
-function toggleDemo(id){
-  const el=document.getElementById(id), arrow=document.getElementById(id+'-arrow');
-  const isOpen = el.style.maxHeight && el.style.maxHeight!=='0px';
-  ['d1','d2','d3','d4','d5'].forEach(d=>{
-    document.getElementById(d).style.maxHeight='0px';
-    const a=document.getElementById(d+'-arrow');
-    if(a){a.style.transform='rotate(0deg)';a.style.color='#64748B';}
-  });
-  if(!isOpen){
-    el.style.maxHeight = el.scrollHeight+300+'px';
-    arrow.style.transform='rotate(180deg)';
-    arrow.style.color='#8B5CF6';
+  draw(){
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=this.color+this.alpha+')'; ctx.fill();
   }
 }
 
-// ── TOAST ──
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
+for(let i=0;i<120;i++) particles.push(new Particle());
 
-// ── COPIAR ──
-function copyRef(){
-  navigator.clipboard?.writeText('https://syncroquantume.app/ref/TU-CODIGO').catch(()=>{});
-  const btn=document.getElementById('refCopyBtn');
-  btn.textContent='¡Copiado ✓'; btn.style.background='linear-gradient(135deg,#10B981,#06B6D4)';
-  showToast('🔗 Link de referido copiado ✓');
-  setTimeout(()=>{btn.textContent='Copiar';btn.style.background='linear-gradient(135deg,#7C3AED,#10B981)'},2500);
-}
-function copyEnvCmds(btn){
-  navigator.clipboard?.writeText('"Ok Google, activa modo concentración"\n"Alexa, pon temperatura a 20 grados"\n"Siri, activa No Molestar 90 minutos"').catch(()=>{});
-  showToast('📋 Comandos copiados ✓');
-  const o=btn.textContent; btn.textContent='¡Copiado ✓'; btn.style.background='linear-gradient(135deg,#06B6D4,#10B981)';
-  setTimeout(()=>{btn.textContent=o;btn.style.background='linear-gradient(135deg,#10B981,#06B6D4)'},2500);
-}
-function shareWA(){
-  window.open('https://wa.me/?text='+encodeURIComponent('🚀 Prueba SYNCRO QUANTUM gratis — el asistente de IA que transforma tu vida. Usá mi link y los dos ganamos 1 mes gratis: https://syncroquantume.app/ref/TU-CODIGO'),'_blank');
-}
-function shareOther(btn){
-  navigator.clipboard?.writeText('🚀 SYNCRO QUANTUM — IA que transforma tu vida: https://syncroquantume.app/ref/TU-CODIGO').catch(()=>{});
-  showToast('📋 Texto copiado ✓');
-  const o=btn.innerHTML; btn.innerHTML='¡Copiado ✓';
-  setTimeout(()=>{btn.innerHTML=o},2500);
-}
-
-// ── MODAL ──
-const modals = {
-  settings:`<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:16px">⚙️ Ajustes</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)"><span style="font-size:13px">Notificaciones</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#10B981);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)"><span style="font-size:13px">Briefing 7:00 am</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#10B981,#06B6D4);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0"><span style="font-size:13px">Modo oscuro</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#EC4899);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#475569;text-align:center">Syncro Quantum v1.0 · © 2025</div>`,
-  privacy:`<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px">🔐 Privacidad</div><div style="display:flex;flex-direction:column;gap:9px"><div style="padding:12px;background:rgba(99,179,237,.07);border:1px solid rgba(99,179,237,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#63B3ED">🔐 Cifrado E2E:</strong> Solo tú accedes a tu información.</div><div style="padding:12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#10B981">🚫 Sin venta:</strong> Nunca compartimos tus datos con terceros.</div><div style="padding:12px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#8B5CF6">🗑️ Borrado:</strong> Elimina todo cuando quieras, sin retención.</div></div>`
-};
-
-function openModal(type){
-  document.getElementById('modal-content').innerHTML = modals[type]||'';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(e){
-  if(e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
-}
-
-// ── PWA INSTALL ──
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; });
-
-function installApp(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r=>{ if(r.outcome==='accepted') showToast('✅ App instalada correctamente'); deferredPrompt=null; });
-  } else {
-    modals.install_hint = `<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px">📲 Instalar app</div><div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><div style="padding:11px;background:rgba(255,255,255,.04);border-radius:11px;line-height:1.5"><strong style="color:#F8FAFC">iPhone / Safari:</strong><br><span style="color:#94A3B8">Toca ⬆ Compartir → "Añadir a inicio"</span></div><div style="padding:11px;background:rgba(255,255,255,.04);border-radius:11px;line-height:1.5"><strong style="color:#F8FAFC">Android / Chrome:</strong><br><span style="color:#94A3B8">Menú ⋮ → "Añadir a pantalla de inicio"</span></div></div>`;
-    openModal('install_hint');
-  }
-}
-
-// ── SERVICE WORKER + AUTO-UPDATE ──
-let swReg = null;
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js')
-    .then(reg=>{
-      swReg = reg;
-      reg.addEventListener('updatefound',()=>{
-        const nw = reg.installing;
-        nw.addEventListener('statechange',()=>{
-          if(nw.state==='installed' && navigator.serviceWorker.controller){
-            document.getElementById('update-banner').classList.add('show');
-          }
-        });
-      });
-      setInterval(()=>reg.update(), 30*60*1000);
-    })
-    .catch(()=>{});
-}
-function applyUpdate(){
-  if(swReg && swReg.waiting) swReg.waiting.postMessage({type:'SKIP_WAITING'});
-  showToast('🔄 Aplicando actualización…');
-  setTimeout(()=>location.reload(),800);
-}
-navigator.serviceWorker?.addEventListener('controllerchange',()=>location.reload());
-
-// ── BOOT ──
-window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    let savedUser = null;
-    try{ const s=localStorage.getItem('sq_user'); if(s) savedUser=JSON.parse(s); }catch(e){}
-    const splash = document.getElementById('splash');
-    splash.classList.add('hidden');
-    setTimeout(()=>{
-      splash.style.display = 'none';
-      if(savedUser){
-        currentUser = savedUser;
-        showApp(savedUser);
-      } else {
-        const ls = document.getElementById('login-screen');
-        ls.classList.remove('hidden');
-        ls.style.display = 'flex';
+function connectParticles(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(124,58,237,${(1-dist/100)*.12})`;
+        ctx.lineWidth=.5; ctx.stroke();
       }
-    },300);
-  }, 2200);
+    }
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{ p.update(); p.draw(); });
+  connectParticles();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ── NAVBAR SCROLL ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled', window.scrollY>50);
 });
+
+// ── REVEAL ON SCROLL ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.1});
+reveals.forEach(r=>observer.observe(r));
+
+// ── COUNT UP ──
+function countUp(el, target, suffix=''){
+  let start=0, duration=2000, step=target/duration*16;
+  const timer=setInterval(()=>{
+    start+=step;
+    if(start>=target){ start=target; clearInterval(timer); }
+    el.textContent = target>100 ? Math.floor(start).toLocaleString()+suffix : Math.floor(start)+suffix;
+  },16);
+}
+
+const countObserver = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target, target=parseInt(el.dataset.target);
+      if(target===12000) countUp(el,12000,'+');
+      else if(target===98) countUp(el,98,'%');
+      else if(target===3) countUp(el,3,'');
+      countObserver.unobserve(el);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>countObserver.observe(el));
+
+// ── RIPPLE EFFECT ──
+document.querySelectorAll('.btn-primary,.btn-secondary,.price-btn').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    const r=document.createElement('span');
+    const rect=btn.getBoundingClientRect();
+    r.style.cssText=`position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);width:4px;height:4px;top:${e.clientY-rect.top}px;left:${e.clientX-rect.left}px;transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none`;
+    btn.style.position='relative'; btn.style.overflow='hidden';
+    btn.appendChild(r);
+    setTimeout(()=>r.remove(),600);
+  });
+});
+
+const style=document.createElement('style');
+style.textContent='@keyframes ripple{to{transform:scale(80);opacity:0}}';
+document.head.appendChild(style);
 </script>
 </body>
 </html>
