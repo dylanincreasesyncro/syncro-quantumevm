@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+ <!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Syncro Quantum</title>
   <meta name="description" content="Tu asistente personal de IA adaptativo">
-  <meta name="theme-color" content="#6A0DAD">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="msapplication-TileColor" content="#0A043C">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Syncro Q">
+  <meta property="og:image" content="/icons/icon-512x512.png">
 
-  <!-- MANIFEST — UNA SOLA VEZ -->
   <link rel="manifest" href="/manifest.json">
-
-  <!-- ÍCONOS -->
   <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
   <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
 
-  <!-- SERVICE WORKER -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -27,67 +28,12 @@
     }
   </script>
 
-  <!-- Tu CSS aquí (la etiqueta <style> que ya tienes) -->
-  ...
+  <style>
+    /* ... aquí va tu bloque <style> que ya tienes ... */
+  </style>
 </head>
-<!-- CONFIGURACIÓN -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6A0DAD">
-
-<!-- ACTIVADOR -->
-<script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js');
-    });
-}
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Syncroquantume</title>
-
-
-
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Syncroquantume</title>
-
-
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Syncroquantume</title>
-
-
-<link rel="apple-touch-icon" sizes="512x512" href="https://i.imgur.com/9X7z8Lk.png">
-<meta property="og:image" content="https://i.imgur.com/9X7z8Lk.png">
-<meta name="theme-color" content="#6A0DAD">
-<script>
-let manifest = {
-  "name": "Syncroquantume",
-  "short_name": "Syncro",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0A043C",
-  "theme_color": "#6A0DAD",
-  "icons": [{"src":"https://i.imgur.com/9X7z8Lk.png","sizes":"512x512","type":"image/png"}]
-};
-let blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-let url = URL.createObjectURL(blob);
-let link = document.createElement('link');
-link.rel = 'manifest';
-link.href = url;
-document.head.appendChild(link);
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('https://cdn.jsdelivr.net/gh/dylanincreasesyncro/syncro-quantumevm@main/sw.js');
-</script>
-
-<link rel="icon" type="image/png" sizes="512x512" href="https://i.imgur.com/9X7z8Lk.png">
-<link rel="apple-touch-icon" sizes="512x512" href="https://i.imgur.com/9X7z8Lk.png">
-<meta property="og:image" content="https://i.imgur.com/9X7z8Lk.png">
-<meta name="theme-color" content="#6A0DAD">
-<script>
-let manifest = {
+<body>
+  
   "name": "Syncroquantume",
   "short_name": "Syncro",
   "start_url": "/",
