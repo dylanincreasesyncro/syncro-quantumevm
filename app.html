@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SyncroQuantume — App</title>
+  <meta name="description" content="Tu asistente personal de IA adaptativo">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="msapplication-TileColor" content="#0A043C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Syncro Q">
+  <meta property="og:title" content="SyncroQuantume">
+  <meta property="og:description" content="Tu asistente personal de IA adaptativo">
+  <meta property="og:image" content="/icons/icon-512x512.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;z-index:200;transition:opacity .4s ease,transform .4s ease}
+    .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
+    #app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;opacity:0;transition:opacity .4s ease}
+    #app.visible{opacity:1}
+    #header{flex-shrink:0;padding:12px 18px 10px;background:rgba(13,17,23,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;z-index:100}
+    .hlogo{display:flex;align-items:center;gap:8px}
+    .hlogo-sq{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff}
+    .hlogo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(90deg,#8B5CF6,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hright{display:flex;align-items:center;gap:10px}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:blink 2s ease-in-out infinite}
+    #pages{flex:1;overflow:hidden;position:relative}
+    .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .page::-webkit-scrollbar{display:none}
+    .page.active{opacity:1;pointer-events:all;transform:translateX(0)}
+    .page-inner{padding:18px 18px 100px}
+    #tabbar{flex-shrink:0;display:flex;background:rgba(13,17,23,.94);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:100}
+    .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:12px;transition:background .2s;position:relative}
+    .tab:active{background:rgba(255,255,255,.05)}
+    .tab-icon{font-size:20px;transition:transform .2s}
+    .tab-label{font-size:10px;font-weight:500;color:#64748B;transition:color .2s}
+    .tab.active .tab-label{font-weight:700}
+    .tab-badge{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#EF4444;border:1.5px solid #0D1117;display:none}
+    .tab-badge.show{display:block}
+    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px}
+    .sec-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+    .ttl{font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.2;margin-bottom:7px}
+    .sub{font-size:13px;color:#94A3B8;line-height:1.7;margin-bottom:22px}
+    .frame{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .frame-bar{height:30px;background:#131b2e;display:flex;align-items:center;padding:0 12px;gap:5px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .dot{width:9px;height:9px;border-radius:50%}
+    .screen-bg{background:#0f172a;padding:16px}
+    .btn-p{display:block;text-align:center;padding:14px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:transform .15s;width:100%}
+    .btn-p:active{transform:scale(.97)}
+    .btn-g{display:block;text-align:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,#10B981,#06B6D4);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(16,185,129,.35);transition:transform .15s;width:100%}
+    .btn-g:active{transform:scale(.97)}
+    .btn-out{display:block;text-align:center;padding:12px;border-radius:16px;background:transparent;color:#8B5CF6;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid rgba(124,58,237,.35);cursor:pointer;transition:background .2s;width:100%}
+    .input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px;color:#F8FAFC;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+    .input:focus{border-color:#7C3AED}
+    .input::placeholder{color:#475569}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+    @keyframes scan{0%{top:0;opacity:1}80%{opacity:.8}100%{top:100%;opacity:0}}
+    @keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:.12}}
+    @keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
+    @keyframes glow{0%,100%{box-shadow:0 0 18px rgba(124,58,237,.3)}50%{box-shadow:0 0 36px rgba(124,58,237,.6)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    #update-banner{position:fixed;bottom:80px;left:12px;right:12px;background:linear-gradient(135deg,#7C3AED,#10B981);color:#fff;padding:13px 16px;border-radius:18px;z-index:9999;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(124,58,237,.5);font-size:13px;font-weight:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1)}
+    #update-banner.show{transform:translateY(0)}
+    .update-btn{background:rgba(255,255,255,.25);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
+    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#F8FAFC;padding:9px 20px;border-radius:24px;font-size:12px;font-weight:600;z-index:9998;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(124,58,237,.3);box-shadow:0 4px 18px rgba(0,0,0,.4)}
+    #toast.show{opacity:1}
+    #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+    #modal-overlay.open{opacity:1;pointer-events:all}
+    #modal{background:#0f172a;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;border:1px solid rgba(255,255,255,.1);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1)}
+    #modal-overlay.open #modal{transform:translateY(0)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.4);font-size:11px;text-decoration:none;padding:4px 0;transition:color .2s}
+    .back-btn:hover{color:rgba(255,255,255,0.7)}
+  </style>
+</head>
+<body>
+<div id="splash" class="screen" style="background:#0D1117">
+  <div style="position:absolute;width:400px;height:400px;background:rgba(124,58,237,.15);border-radius:50%;filter:blur(90px);pointer-events:none"></div>
+  <div style="animation:float 3s ease-in-out infinite;position:relative;z-index:1;margin-bottom:24px">
+    <svg width="220" height="85" viewBox="0 0 220 85" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      <defs>
+        <linearGradient id="sg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
+        <filter id="sgf"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="url(#sg1)" stroke-width="1" opacity=".55" style="animation:spin 4s linear infinite;transform-origin:30px 30px"/>
+      <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="#EC4899" stroke-width=".7" opacity=".4" transform="rotate(60,30,30)" style="animation:spinR 5s linear infinite;transform-origin:30px 30px"/>
+      <circle cx="30" cy="30" r="10" fill="none" stroke="url(#sg1)" stroke-width="2" filter="url(#sgf)"/>
+      <line x1="36" y1="36" x2="42" y2="42" stroke="url(#sg1)" stroke-width="2" stroke-linecap="round" filter="url(#sgf)"/>
+      <circle cx="30" cy="30" r="3" fill="url(#sg1)" filter="url(#sgf)" style="animation:pulse 2s ease-in-out infinite"/>
+      <circle r="1.8" fill="#EC4899"><animateMotion dur="3s" repeatCount="indefinite" path="M30,30 m-20,0 a20,8 0 1,1 0,0.01"/></circle>
+      <circle r="1.4" fill="#06B6D4"><animateMotion dur="4.5s" repeatCount="indefinite" path="M30,30 m0,-8 a20,8 60 1,1 0,0.01"/></circle>
+      <text x="56" y="25" font-family="Syne,sans-serif" font-weight="800" font-size="20" fill="url(#sg1)" filter="url(#sgf)" letter-spacing="2">SYNCRO</text>
+      <line x1="56" y1="31" x2="208" y2="31" stroke="#EC4899" stroke-width=".6" opacity=".5"/>
+      <text x="56" y="46" font-family="Syne,sans-serif" font-weight="700" font-size="13" fill="#F8FAFC" letter-spacing="6" opacity=".9">QUANTUME</text>
+      <text x="56" y="58" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" letter-spacing="1.5">ADAPTIVE INTELLIGENCE</text>
+    </svg>
+  </div>
+  <div style="display:flex;gap:5px;margin-top:8px">
+    <div style="width:6px;height:6px;border-radius:50%;background:#7C3AED;animation:wave 1.2s ease-in-out infinite"></div>
+    <div style="width:6px;height:6px;border-radius:50%;background:#8B5CF6;animation:wave 1.2s ease-in-out .15s infinite"></div>
+    <div style="width:6px;height:6px;border-radius:50%;background:#10B981;animation:wave 1.2s ease-in-out .3s infinite"></div>
+  </div>
+  <div style="font-size:12px;color:#475569;margin-top:10px">Iniciando tu asistente…</div>
+</div>
+
+<div id="login-screen" class="screen hidden" style="background:#0D1117;overflow-y:auto">
+  <div style="position:absolute;width:350px;height:350px;background:rgba(124,58,237,.13);border-radius:50%;filter:blur(80px);top:-100px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
+  <div style="width:100%;max-width:360px;position:relative;z-index:1">
+    <a href="index.html" class="back-btn" style="margin-bottom:24px;display:inline-flex">← Volver al inicio</a>
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px;animation:glow 3s ease-in-out infinite">🧬</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px">Bienvenido de vuelta</div>
+      <div style="font-size:13px;color:#94A3B8">Inicia sesión en tu asistente cuántico</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+      <div>
+        <div style="font-size:12px;color:#94A3B8;margin-bottom:7px;font-weight:500">Correo electrónico</div>
+        <input id="login-email" class="input" type="email" placeholder="tu@correo.com" autocomplete="email"/>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+          <span style="font-size:12px;color:#94A3B8;font-weight:500">Contraseña</span>
+          <span style="font-size:12px;color:#7C3AED;cursor:pointer" onclick="showToast('📧 Revisa tu correo para restablecer')">¿Olvidaste?</span>
+        </div>
+        <div style="position:relative">
+          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px"/>
+          <button onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;cursor:pointer;font-size:16px" id="eye-btn">👁️</button>
+        </div>
+      </div>
+    </div>
+    <div id="login-error" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:#EF4444;margin-bottom:14px;text-align:center"></div>
+    <button onclick="doLogin()" id="login-btn" style="width:100%;padding:15px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);margin-bottom:14px;transition:transform .15s">Iniciar sesión →</button>
+    <div style="text-align:center;font-size:12px;color:#94A3B8;margin-bottom:20px">¿No tienes cuenta? <span style="color:#7C3AED;cursor:pointer;font-weight:600" onclick="goTab('planes');hideLogin()">Empieza gratis →</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+      <span style="font-size:11px;color:#475569">o continúa con</span>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+    </div>
+    <button onclick="googleLogin()" style="width:100%;padding:13px;border-radius:14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);color:#F8FAFC;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Inter',sans-serif;transition:background .2s">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
+      Continuar con Google
+    </button>
+    <div style="text-align:center;margin-top:20px;font-size:11px;color:#475569">🔐 Acceso seguro · Sin venta de datos · Cancela cuando quieras</div>
+  </div>
+</div>
+
+<div id="app">
+  <div id="header">
+    <div class="hlogo">
+      <div class="hlogo-sq">SQ</div>
+      <span class="hlogo-name">SyncroQuantume</span>
+    </div>
+    <div class="hright">
+      <div class="live-dot"></div>
+      <span id="user-chip" style="font-size:11px;color:#94A3B8;background:rgba(255,255,255,.05);padding:4px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08)"></span>
+      <button style="background:none;border:none;color:#94A3B8;font-size:18px;cursor:pointer" onclick="openModal('settings')">⚙️</button>
+    </div>
+  </div>
+  <div id="pages">
+    <div class="page active" id="page-home"><div class="page-inner">
+      <div style="text-align:center;padding:16px 0 24px;position:relative">
+        <div style="position:absolute;width:280px;height:280px;background:rgba(124,58,237,.1);border-radius:50%;filter:blur(70px);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
+        <div style="margin-bottom:16px;animation:float 4s ease-in-out infinite;position:relative;z-index:1">
+          <svg width="220" height="80" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+            <defs><linearGradient id="hl1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="50%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#10B981"/></linearGradient><filter id="hgf"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="url(#hl1)" stroke-width="1" opacity=".55" style="animation:spin 4s linear infinite;transform-origin:30px 30px"/>
+            <ellipse cx="30" cy="30" rx="20" ry="8" fill="none" stroke="#EC4899" stroke-width=".7" opacity=".4" transform="rotate(60,30,30)" style="animation:spinR 5s linear infinite;transform-origin:30px 30px"/>
+            <circle cx="30" cy="30" r="10" fill="none" stroke="url(#hl1)" stroke-width="2" filter="url(#hgf)"/>
+            <line x1="36" y1="36" x2="42" y2="42" stroke="url(#hl1)" stroke-width="2" stroke-linecap="round" filter="url(#hgf)"/>
+            <circle cx="30" cy="30" r="3" fill="url(#hl1)" filter="url(#hgf)" style="animation:pulse 2s ease-in-out infinite"/>
+            <circle r="1.8" fill="#EC4899"><animateMotion dur="3s" repeatCount="indefinite" path="M30,30 m-20,0 a20,8 0 1,1 0,0.01"/></circle>
+            <circle r="1.4" fill="#06B6D4"><animateMotion dur="4.5s" repeatCount="indefinite" path="M30,30 m0,-8 a20,8 60 1,1 0,0.01"/></circle>
+            <text x="56" y="24" font-family="Syne,sans-serif" font-weight="800" font-size="19" fill="url(#hl1)" filter="url(#hgf)" letter-spacing="2">SYNCRO</text>
+            <line x1="56" y1="30" x2="208" y2="30" stroke="#EC4899" stroke-width=".6" opacity=".5"/>
+            <text x="56" y="44" font-family="Syne,sans-serif" font-weight="700" font-size="12" fill="#F8FAFC" letter-spacing="6" opacity=".9">QUANTUME</text>
+            <text x="56" y="56" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8" letter-spacing="1.5">ADAPTIVE INTELLIGENCE</text>
+          </svg>
+        </div>
+        <div id="home-greeting" style="font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.15;margin-bottom:9px;position:relative;z-index:1">Tu vida,<br><span style="background:linear-gradient(90deg,#7C3AED,#EC4899,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">optimizada por IA.</span></div>
+        <p style="font-size:13px;color:#94A3B8;line-height:1.75;margin-bottom:18px;max-width:270px;margin-left:auto;margin-right:auto;position:relative;z-index:1">La IA que te conoce mejor que tú mismo. Predice, actúa y mejora — antes de que lo necesites.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1">
+          <button class="btn-p" onclick="goTab('demos')">🎬 Ver demos en vivo</button>
+          <button class="btn-out" onclick="goTab('planes')">Ver planes y precios →</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px">
+        <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#7C3AED,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">12K+</div><div style="font-size:10px;color:#64748B;margin-top:2px">Usuarios</div></div>
+        <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#F59E0B,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div><div style="font-size:10px;color:#64748B;margin-top:2px">Rating</div></div>
+        <div class="card" style="padding:12px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">98%</div><div style="font-size:10px;color:#64748B;margin-top:2px">Renuevan</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧠</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Coach IA 24/7</div><div style="font-size:12px;color:#94A3B8">Responde con contexto real</div></div><span style="color:#64748B;font-size:16px">›</span></div>
+        <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(236,72,153,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Lectura biométrica</div><div style="font-size:12px;color:#94A3B8">Detecta estrés por cámara</div></div><span style="color:#64748B;font-size:16px">›</span></div>
+        <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:38px;height:38px;border-radius:11px;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔮</div><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:2px">Predicción cuántica</div><div style="font-size:12px;color:#94A3B8">Tu estado, hora por hora</div></div><span style="color:#64748B;font-size:16px">›</span></div>
+      </div>
+    </div></div>
+    <div class="page" id="page-demos"><div class="page-inner">
+      <div style="margin-bottom:20px">
+        <div class="sec-tag" style="background:rgba(124,58,237,.12);color:#8B5CF6;border:1px solid rgba(124,58,237,.25)">Demos en vivo</div>
+        <div class="ttl">Míralo funcionar<br><span style="background:linear-gradient(90deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en tiempo real</span></div>
+        <div class="sub">Toca cada demo para expandirla.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d1')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#7C3AED,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💬</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Coach IA en vivo</div><div style="font-size:11px;color:#94A3B8">Conversación real con contexto</div></div><span id="d1-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div><div id="d1" style="max-height:0;overflow:hidden;transition:max-height .4s ease"><div style="padding:0 14px 14px"><div class="frame"><div class="frame-bar"><div class="dot" style="background:#FF5F57"></div><div class="dot" style="background:#FFBD2E"></div><div class="dot" style="background:#28C840"></div><span style="margin-left:8px;font-size:10px;color:#94A3B8">Coach · En línea</span></div><div class="screen-bg" style="display:flex;flex-direction:column;gap:10px;min-height:180px;padding:14px 12px"><div style="display:flex;justify-content:flex-end"><div style="background:linear-gradient(135deg,#7C3AED,#8B5CF6);color:#fff;padding:9px 13px;border-radius:14px 14px 4px 14px;max-width:78%;font-size:12px">Estoy cansado y tengo reunión en 1h.</div></div><div style="display:flex;gap:7px;align-items:flex-start"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">🤖</div><div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:4px 14px 14px 14px;padding:10px 12px;max-width:82%;font-size:12px;line-height:1.6;color:#E2E8F0"><strong style="color:#10B981">Fatiga media.</strong> 58 min antes.<br>✅ 10 min de descanso ahora.<br>🎯 Llegas al 78% — suficiente.</div></div></div></div></div></div></div>
+        <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toggleDemo('d2')"><div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#EC4899,#F59E0B);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:2px">Lectura biométrica</div><div style="font-size:11px;color:#94A3B8">Escaneo facial en 15 segundos</div></div><span id="d2-arrow" style="color:#64748B;font-size:13px;transition:transform .3s">▼</span></div><div id="d2" style="max-height:0;overflow:hidden;transition:max-height .4s ease"><div style="padding:0 14px 14px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><div class="card" style="padding:12px;text-align:center"><div style="font-size:10px;color:#94A3B8;margin-bottom:4px">Estrés</div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#F59E0B">4/10</div></div><div class="card" style="padding:12px;text-align:center"><div style="font-size:10px;color:#94A3B8;margin-bottom:4px">Energía</div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#10B981">7/10</div></div><div class="card" style="padding:12px;text-align:center"><div style="font-size:10px;color:#94A3B8;margin-bottom:4px">Emoción</div><div style="font-size:14px;font-weight:700;color:#8B5CF6;margin-top:4px">Concentrado</div></div><div class="card" style="padding:12px;text-align:center"><div style="font-size:10px;color:#94A3B8;margin-bottom:4px">Confianza</div><div style="font-size:14px;font-weight:700;color:#06B6D4;margin-top:4px">94%</div></div></div></div></div></div>
+      </div>
+    </div></div>
+    <div class="page" id="page-planes"><div class="page-inner">
+      <div style="margin-bottom:20px"><div class="sec-tag" style="background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.25)">Elige tu perfil</div><div class="ttl">3 planes, <span style="background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">un universo</span></div><div class="sub">Todos incluyen <strong style="color:#10B981">3 días gratis</strong>. Sin tarjeta.</div></div>
+      <div class="card" style="padding:20px;margin-bottom:12px;border-color:rgba(236,72,153,.3);position:relative;overflow:hidden"><div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(236,72,153,.1);border-radius:50%;filter:blur(40px)"></div><div style="position:absolute;top:14px;right:14px;font-size:9px;font-weight:700;padding:2px 9px;border-radius:18px;background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.35);color:#EC4899">Popular</div><div style="font-size:22px;margin-bottom:8px">🎨</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Creativa</div><div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Tu estudio creativo inteligente</div><div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#7C3AED,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">$89<span style="font-size:13px;color:#64748B">/mes</span></div><a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#7C3AED,#EC4899)">Empezar gratis →</a></div>
+      <div class="card" style="padding:20px;margin-bottom:12px;border-color:rgba(16,185,129,.3);position:relative;overflow:hidden"><div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(16,185,129,.08);border-radius:50%;filter:blur(40px)"></div><div style="font-size:22px;margin-bottom:8px">🌿</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Bienestar</div><div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Vive en armonía, sin estrés</div><div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#10B981,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">$79<span style="font-size:13px;color:#64748B">/mes</span></div><a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="btn-g">Empezar gratis →</a></div>
+      <div class="card" style="padding:20px;border-color:rgba(245,158,11,.3);position:relative;overflow:hidden"><div style="position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:rgba(245,158,11,.07);border-radius:50%;filter:blur(40px)"></div><div style="font-size:22px;margin-bottom:8px">⚡</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px">Inteligente</div><div style="font-size:12px;color:#94A3B8;margin-bottom:12px">Cada peso, en su lugar</div><div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(90deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">$49<span style="font-size:13px;color:#64748B">/mes</span></div><a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#F59E0B,#EF4444);box-shadow:0 5px 16px rgba(245,158,11,.35)">Empezar gratis →</a></div>
+      <div style="text-align:center;margin-top:14px;font-size:11px;color:#475569">💙 PayPal · 🔵 Mercado Pago · Cancela cuando quieras</div>
+    </div></div>
+    <div class="page" id="page-perfil"><div class="page-inner">
+      <div style="text-align:center;padding:16px 0 22px">
+        <div style="position:relative;display:inline-block;margin-bottom:14px"><div id="profile-avatar" style="width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:32px;animation:glow 3s ease-in-out infinite">😊</div><div style="position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:#10B981;border:2px solid #0D1117;display:flex;align-items:center;justify-content:center;font-size:10px">✓</div></div>
+        <div id="profile-name" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:3px">Mi perfil</div>
+        <div id="profile-email-display" style="font-size:12px;color:#94A3B8;margin-bottom:8px"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="goTab('planes')"><div style="width:36px;height:36px;border-radius:11px;background:rgba(124,58,237,.12);display:flex;align-items:center;justify-content:center;font-size:16px">💎</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Ver planes</div><div style="font-size:11px;color:#94A3B8">Creativa · Bienestar · Inteligente</div></div><span style="color:#64748B;font-size:14px">›</span></div>
+        <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="installApp()"><div style="width:36px;height:36px;border-radius:11px;background:rgba(6,182,212,.1);display:flex;align-items:center;justify-content:center;font-size:16px">📲</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Instalar app</div><div style="font-size:11px;color:#94A3B8">Añadir a pantalla de inicio</div></div><span style="color:#64748B;font-size:14px">›</span></div>
+        <a href="index.html" class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;text-decoration:none"><div style="width:36px;height:36px;border-radius:11px;background:rgba(99,179,237,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#F8FAFC">Ir al sitio web</div><div style="font-size:11px;color:#94A3B8">Ver landing page principal</div></div><span style="color:#64748B;font-size:14px">›</span></a>
+        <div class="card" style="padding:13px 15px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="doLogout()"><div style="width:36px;height:36px;border-radius:11px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🚪</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#EF4444">Cerrar sesión</div><div style="font-size:11px;color:#94A3B8">Salir de tu cuenta</div></div><span style="color:#64748B;font-size:14px">›</span></div>
+      </div>
+    </div></div>
+  </div>
+  <div id="tabbar">
+    <button class="tab active" onclick="goTab('home')" id="tab-home"><span class="tab-icon">🏠</span><span class="tab-label" style="color:#8B5CF6">Inicio</span></button>
+    <button class="tab" onclick="goTab('demos')" id="tab-demos"><span class="tab-icon">🎬</span><span class="tab-label">Demos</span></button>
+    <button class="tab" onclick="goTab('planes')" id="tab-planes"><span class="tab-icon">💎</span><span class="tab-label">Planes</span></button>
+    <button class="tab" onclick="goTab('perfil')" id="tab-perfil"><span class="tab-icon">👤</span><span class="tab-label">Perfil</span></button>
+  </div>
+</div>
+
+<div id="update-banner"><span>✨ Nueva versión disponible</span><button class="update-btn" onclick="applyUpdate()">Actualizar ahora</button></div>
+<div id="toast"></div>
+<div id="modal-overlay" onclick="closeModal(event)"><div id="modal"><div id="modal-content"></div></div></div>
+
+<script>
+const ADMIN_EMAIL='dylanincrease@gmail.com',ADMIN_PASS='syncro2025';
+let currentUser=null,passVisible=false;
+function togglePass(){const i=document.getElementById('login-pass'),b=document.getElementById('eye-btn');passVisible=!passVisible;i.type=passVisible?'text':'password';b.textContent=passVisible?'🙈':'👁️'}
+function doLogin(){const email=document.getElementById('login-email').value.trim().toLowerCase(),pass=document.getElementById('login-pass').value,errEl=document.getElementById('login-error'),btn=document.getElementById('login-btn');errEl.style.display='none';if(!email||!pass){showLoginError('Por favor completa todos los campos');return}if(!/\S+@\S+\.\S+/.test(email)){showLoginError('El correo no es válido');return}btn.textContent='Verificando…';btn.style.opacity='.7';setTimeout(()=>{if(email===ADMIN_EMAIL.toLowerCase()&&pass===ADMIN_PASS){loginSuccess({email,name:'Dylan',role:'admin'})}else if(email!==ADMIN_EMAIL.toLowerCase()&&pass.length>=6){loginSuccess({email,name:email.split('@')[0],role:'user'})}else{btn.textContent='Iniciar sesión →';btn.style.opacity='1';showLoginError('Correo o contraseña incorrectos')}},900)}
+function showLoginError(msg){const el=document.getElementById('login-error');el.textContent=msg;el.style.display='block'}
+function loginSuccess(user){currentUser=user;try{localStorage.setItem('sq_user',JSON.stringify(user))}catch(e){}document.getElementById('login-btn').textContent='Iniciando…';setTimeout(()=>{hideLogin();showApp(user)},400)}
+function showApp(user){document.getElementById('app').classList.add('visible');document.getElementById('user-chip').textContent=user.name?user.name.substring(0,2).toUpperCase():'?';document.getElementById('profile-name').textContent=user.name||'Mi perfil';document.getElementById('profile-email-display').textContent=user.email;goTab('home')}
+function hideLogin(){const ls=document.getElementById('login-screen');ls.classList.add('hidden');ls.style.display='none'}
+function googleLogin(){showToast('🔄 Autenticación con Google próximamente')}
+function doLogout(){try{localStorage.removeItem('sq_user')}catch(e){}currentUser=null;document.getElementById('app').classList.remove('visible');const ls=document.getElementById('login-screen');ls.style.display='flex';ls.classList.remove('hidden');document.getElementById('login-email').value='';document.getElementById('login-pass').value='';document.getElementById('login-btn').textContent='Iniciar sesión →';document.getElementById('login-btn').style.opacity='1';showToast('👋 Sesión cerrada')}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('hidden'))doLogin()});
+let currentTab='home';
+const tabAccents={home:'#8B5CF6',demos:'#EC4899',planes:'#10B981',perfil:'#06B6D4'};
+function goTab(tab){if(tab===currentTab)return;document.getElementById('page-'+currentTab).classList.remove('active');const ct=document.getElementById('tab-'+currentTab);if(ct){ct.classList.remove('active');ct.querySelector('.tab-label').style.color=''}currentTab=tab;const np=document.getElementById('page-'+tab);np.classList.add('active');np.scrollTop=0;const nt=document.getElementById('tab-'+tab);if(nt){nt.classList.add('active');nt.querySelector('.tab-label').style.color=tabAccents[tab]||'#8B5CF6';nt.querySelector('.tab-icon').style.transform='scale(1.18)';setTimeout(()=>nt.querySelector('.tab-icon').style.transform='scale(1)',220)}}
+let tx=0,ty=0;
+const tabs=['home','demos','planes','perfil'];
+document.getElementById('pages').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.getElementById('pages').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){const i=tabs.indexOf(currentTab);if(dx<0&&i<tabs.length-1)goTab(tabs[i+1]);else if(dx>0&&i>0)goTab(tabs[i-1])}},{passive:true});
+function toggleDemo(id){const el=document.getElementById(id),arrow=document.getElementById(id+'-arrow');const isOpen=el.style.maxHeight&&el.style.maxHeight!=='0px';['d1','d2','d3','d4','d5'].forEach(d=>{const e=document.getElementById(d);if(e)e.style.maxHeight='0px';const a=document.getElementById(d+'-arrow');if(a){a.style.transform='rotate(0deg)';a.style.color='#64748B'}});if(!isOpen){el.style.maxHeight=el.scrollHeight+300+'px';arrow.style.transform='rotate(180deg)';arrow.style.color='#8B5CF6'}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+const modals={settings:`<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:16px">⚙️ Ajustes</div><div style="font-size:13px;color:#94A3B8;margin-bottom:16px">SyncroQuantume v1.0 · © 2025</div><a href="index.html" style="display:block;padding:12px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:12px;color:#8B5CF6;text-decoration:none;font-size:13px;font-weight:600;text-align:center">🏠 Ir al sitio principal</a>`};
+function openModal(type){document.getElementById('modal-content').innerHTML=modals[type]||'';document.getElementById('modal-overlay').classList.add('open')}
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open')}
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
+function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast('✅ App instalada');deferredPrompt=null})}else{showToast('📲 Usa el menú del navegador → Añadir a inicio')}}
+let swReg=null;
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(reg=>{swReg=reg;reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)document.getElementById('update-banner').classList.add('show')})});setInterval(()=>reg.update(),30*60*1000)}).catch(()=>{})}
+function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});showToast('🔄 Aplicando actualización…');setTimeout(()=>location.reload(),800)}
+navigator.serviceWorker?.addEventListener('controllerchange',()=>location.reload());
+window.addEventListener('load',()=>{setTimeout(()=>{let savedUser=null;try{const s=localStorage.getItem('sq_user');if(s)savedUser=JSON.parse(s)}catch(e){}const splash=document.getElementById('splash');splash.classList.add('hidden');setTimeout(()=>{splash.style.display='none';if(savedUser){currentUser=savedUser;showApp(savedUser)}else{const ls=document.getElementById('login-screen');ls.classList.remove('hidden');ls.style.display='flex'}},300)},2200)});
+</script>
+</body>
+</html>
