@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
- <!DOCTYPE html>
-<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -12,178 +10,96 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Syncro Q">
+  <meta property="og:title" content="Syncro Quantum">
+  <meta property="og:description" content="Tu asistente personal de IA adaptativo">
   <meta property="og:image" content="/icons/icon-512x512.png">
 
+  <!-- MANIFEST — una sola vez -->
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
 
+  <!-- ICONOS -->
+  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+
+  <!-- FUENTES -->
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- SERVICE WORKER — una sola vez -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
+      window.addEventListener('load', function () {
         navigator.serviceWorker.register('/sw.js');
       });
     }
   </script>
 
   <style>
-    /* ... aquí va tu bloque <style> que ya tienes ... */
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;z-index:200;transition:opacity .4s ease,transform .4s ease}
+    .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
+    #app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;opacity:0;transition:opacity .4s ease}
+    #app.visible{opacity:1}
+    #header{flex-shrink:0;padding:12px 18px 10px;background:rgba(13,17,23,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;z-index:100}
+    .hlogo{display:flex;align-items:center;gap:8px}
+    .hlogo-sq{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff}
+    .hlogo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(90deg,#8B5CF6,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hright{display:flex;align-items:center;gap:10px}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:blink 2s ease-in-out infinite}
+    #pages{flex:1;overflow:hidden;position:relative}
+    .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .page::-webkit-scrollbar{display:none}
+    .page.active{opacity:1;pointer-events:all;transform:translateX(0)}
+    .page-inner{padding:18px 18px 100px}
+    #tabbar{flex-shrink:0;display:flex;background:rgba(13,17,23,.94);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:100}
+    .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:12px;transition:background .2s;position:relative}
+    .tab:active{background:rgba(255,255,255,.05)}
+    .tab-icon{font-size:20px;transition:transform .2s}
+    .tab-label{font-size:10px;font-weight:500;color:#64748B;transition:color .2s}
+    .tab.active .tab-label{font-weight:700}
+    .tab-badge{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#EF4444;border:1.5px solid #0D1117;display:none}
+    .tab-badge.show{display:block}
+    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px}
+    .glass{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.08);border-radius:18px;backdrop-filter:blur(14px)}
+    .sec-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+    .ttl{font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.2;margin-bottom:7px}
+    .sub{font-size:13px;color:#94A3B8;line-height:1.7;margin-bottom:22px}
+    .frame{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .frame-bar{height:30px;background:#131b2e;display:flex;align-items:center;padding:0 12px;gap:5px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .dot{width:9px;height:9px;border-radius:50%}
+    .screen-bg{background:#0f172a;padding:16px}
+    .btn-p{display:block;text-align:center;padding:14px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:transform .15s;width:100%}
+    .btn-p:active{transform:scale(.97)}
+    .btn-g{display:block;text-align:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,#10B981,#06B6D4);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(16,185,129,.35);transition:transform .15s;width:100%}
+    .btn-g:active{transform:scale(.97)}
+    .btn-out{display:block;text-align:center;padding:12px;border-radius:16px;background:transparent;color:#8B5CF6;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid rgba(124,58,237,.35);cursor:pointer;transition:background .2s;width:100%}
+    .input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px;color:#F8FAFC;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+    .input:focus{border-color:#7C3AED}
+    .input::placeholder{color:#475569}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+    @keyframes scan{0%{top:0;opacity:1}80%{opacity:.8}100%{top:100%;opacity:0}}
+    @keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:.12}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
+    @keyframes glow{0%,100%{box-shadow:0 0 18px rgba(124,58,237,.3)}50%{box-shadow:0 0 36px rgba(124,58,237,.6)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+    #update-banner{position:fixed;bottom:80px;left:12px;right:12px;background:linear-gradient(135deg,#7C3AED,#10B981);color:#fff;padding:13px 16px;border-radius:18px;z-index:9999;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(124,58,237,.5);font-size:13px;font-weight:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1)}
+    #update-banner.show{transform:translateY(0)}
+    .update-btn{background:rgba(255,255,255,.25);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
+    #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#F8FAFC;padding:9px 20px;border-radius:24px;font-size:12px;font-weight:600;z-index:9998;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(124,58,237,.3);box-shadow:0 4px 18px rgba(0,0,0,.4)}
+    #toast.show{opacity:1}
+    #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+    #modal-overlay.open{opacity:1;pointer-events:all}
+    #modal{background:#0f172a;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;border:1px solid rgba(255,255,255,.1);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1)}
+    #modal-overlay.open #modal{transform:translateY(0)}
   </style>
-</head>
-<body>
-  
-  "name": "Syncroquantume",
-  "short_name": "Syncro",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0A043C",
-  "theme_color": "#6A0DAD",
-  "icons": [{"src":"https://i.imgur.com/9X7z8Lk.png","sizes":"512x512","type":"image/png"}]
-};
-let blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-let url = URL.createObjectURL(blob);
-let link = document.createElement('link');
-link.rel = 'manifest';
-link.href = url;
-document.head.appendChild(link);
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('https://cdn.jsdelivr.net/gh/dylanincreasesyncro/syncro-quantumevm@main/sw.js');
-</script>
-
- 
-<meta property="og:image" content="https://i.ibb.co/4sY7wQH/logo-syncro.png">
-<meta name="theme-color" content="#6A0DAD">
-<script>
-let manifest = {
-  "name": "Syncroquantume",
-  "short_name": "Syncro",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0A043C",
-  "theme_color": "#6A0DAD",
-  "icons": [{"src":"https://i.ibb.co/4sY7wQH/logo-syncro.png","sizes":"512x512","type":"image/png"}]
-};
-let blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-let url = URL.createObjectURL(blob);
-let link = document.createElement('link');
-link.rel = 'manifest';
-link.href = url;
-document.head.appendChild(link);
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('https://cdn.jsdelivr.net/gh/dylanincreasesyncro/syncro-quantumevm@main/sw.js');
-</script>
-    <meta property="og:image" content="/logo-syncroquantume.png">
-
-    <!-- ARCHIVO DE CONFIGURACIÓN (OBLIGATORIO) -->
-    <link rel="manifest" href="/manifest.json">
-
-    <!-- COLORES PARA EL NAVEGADOR -->
-    <meta name="theme-color" content="#6A0DAD">
-    <meta name="msapplication-TileColor" content="#0A043C">
-
-<link rel="apple-touch-icon" sizes="512x512" href="/logo-syncroquantume.png">
-<meta property="og:image" content="/logo-syncroquantume.png">
-
-<meta property="og:image" content="https://raw.githubusercontent.com/davidsolisdev/logos/main/logo-syncroquantume.png">
-  <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" sizes="512x512" href="https://i.ibb.co/8x7G7yZ/logo-syncroquantume.png">
-<meta property="og:image" content="https://i.ibb.co/8x7G7yZ/logo-syncroquantume.png">
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#7C3AED"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Syncro Q"/>
-<meta name="description" content="Tu asistente personal de IA adaptativo"/>
-<link rel="manifest" href="/manifest.json"/>
-<title>Syncro Quantum | syncroquantume.com</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
-
-/* ── SCREENS ── */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;z-index:200;transition:opacity .4s ease,transform .4s ease}
-.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
-
-/* ── APP LAYOUT ── */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;opacity:0;transition:opacity .4s ease}
-#app.visible{opacity:1}
-
-/* ── HEADER ── */
-#header{flex-shrink:0;padding:12px 18px 10px;background:rgba(13,17,23,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;z-index:100}
-.hlogo{display:flex;align-items:center;gap:8px}
-.hlogo-sq{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:#fff}
-.hlogo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(90deg,#8B5CF6,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hright{display:flex;align-items:center;gap:10px}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:blink 2s ease-in-out infinite}
-
-/* ── PAGES ── */
-#pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.page::-webkit-scrollbar{display:none}
-.page.active{opacity:1;pointer-events:all;transform:translateX(0)}
-.page-inner{padding:18px 18px 100px}
-
-/* ── TAB BAR ── */
-#tabbar{flex-shrink:0;display:flex;background:rgba(13,17,23,.94);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:100}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:12px;transition:background .2s}
-.tab:active{background:rgba(255,255,255,.05)}
-.tab-icon{font-size:20px;transition:transform .2s}
-.tab-label{font-size:10px;font-weight:500;color:#64748B;transition:color .2s}
-.tab.active .tab-label{font-weight:700}
-.tab-badge{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:#EF4444;border:1.5px solid #0D1117;display:none}
-.tab-badge.show{display:block}
-
-/* ── UI HELPERS ── */
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px}
-.glass{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.08);border-radius:18px;backdrop-filter:blur(14px)}
-.sec-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
-.ttl{font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.2;margin-bottom:7px}
-.sub{font-size:13px;color:#94A3B8;line-height:1.7;margin-bottom:22px}
-.frame{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.frame-bar{height:30px;background:#131b2e;display:flex;align-items:center;padding:0 12px;gap:5px;border-bottom:1px solid rgba(255,255,255,.06)}
-.dot{width:9px;height:9px;border-radius:50%}
-.screen-bg{background:#0f172a;padding:16px}
-.btn-p{display:block;text-align:center;padding:14px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);transition:transform .15s;width:100%}
-.btn-p:active{transform:scale(.97)}
-.btn-g{display:block;text-align:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,#10B981,#06B6D4);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(16,185,129,.35);transition:transform .15s;width:100%}
-.btn-g:active{transform:scale(.97)}
-.btn-out{display:block;text-align:center;padding:12px;border-radius:16px;background:transparent;color:#8B5CF6;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid rgba(124,58,237,.35);cursor:pointer;transition:background .2s;width:100%}
-.input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 16px;color:#F8FAFC;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
-.input:focus{border-color:#7C3AED}
-.input::placeholder{color:#475569}
-
-/* ── ANIMATIONS ── */
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes scan{0%{top:0;opacity:1}80%{opacity:.8}100%{top:100%;opacity:0}}
-@keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.18);opacity:.12}}
-@keyframes orbit{from{transform:rotate(0deg) translateX(26px) rotate(0deg)}to{transform:rotate(360deg) translateX(26px) rotate(-360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
-@keyframes glow{0%,100%{box-shadow:0 0 18px rgba(124,58,237,.3)}50%{box-shadow:0 0 36px rgba(124,58,237,.6)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-
-/* ── UPDATE BANNER ── */
-#update-banner{position:fixed;bottom:80px;left:12px;right:12px;background:linear-gradient(135deg,#7C3AED,#10B981);color:#fff;padding:13px 16px;border-radius:18px;z-index:9999;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 24px rgba(124,58,237,.5);font-size:13px;font-weight:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1)}
-#update-banner.show{transform:translateY(0)}
-.update-btn{background:rgba(255,255,255,.25);color:#fff;border:none;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#F8FAFC;padding:9px 20px;border-radius:24px;font-size:12px;font-weight:600;z-index:9998;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(124,58,237,.3);box-shadow:0 4px 18px rgba(0,0,0,.4)}
-#toast.show{opacity:1}
-
-/* MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-#modal-overlay.open{opacity:1;pointer-events:all}
-#modal{background:#0f172a;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;border:1px solid rgba(255,255,255,.1);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1)}
-#modal-overlay.open #modal{transform:translateY(0)}
-</style>
 </head>
 <body>
 
@@ -221,13 +137,11 @@ html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-
 <div id="login-screen" class="screen hidden" style="background:#0D1117;overflow-y:auto">
   <div style="position:absolute;width:350px;height:350px;background:rgba(124,58,237,.13);border-radius:50%;filter:blur(80px);top:-100px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
   <div style="width:100%;max-width:360px;position:relative;z-index:1">
-
     <div style="text-align:center;margin-bottom:32px">
       <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#10B981);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px;animation:glow 3s ease-in-out infinite">🧬</div>
       <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px">Bienvenido de vuelta</div>
       <div style="font-size:13px;color:#94A3B8">Inicia sesión en tu asistente cuántico</div>
     </div>
-
     <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
       <div>
         <div style="font-size:12px;color:#94A3B8;margin-bottom:7px;font-weight:500">Correo electrónico</div>
@@ -244,32 +158,23 @@ html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-
         </div>
       </div>
     </div>
-
     <div id="login-error" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:10px 14px;font-size:12px;color:#EF4444;margin-bottom:14px;text-align:center"></div>
-
     <button onclick="doLogin()" id="login-btn" style="width:100%;padding:15px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.4);margin-bottom:14px;transition:transform .15s">
       Iniciar sesión →
     </button>
-
     <div style="text-align:center;font-size:12px;color:#94A3B8;margin-bottom:20px">
       ¿No tienes cuenta? <span style="color:#7C3AED;cursor:pointer;font-weight:600" onclick="goTab('planes');hideLogin()">Empieza gratis →</span>
     </div>
-
-    <!-- divider -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
       <span style="font-size:11px;color:#475569">o continúa con</span>
       <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
     </div>
-
     <button onclick="googleLogin()" style="width:100%;padding:13px;border-radius:14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);color:#F8FAFC;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Inter',sans-serif;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
       Continuar con Google
     </button>
-
-    <div style="text-align:center;margin-top:20px;font-size:11px;color:#475569">
-      🔐 Acceso seguro · Sin venta de datos · Cancela cuando quieras
-    </div>
+    <div style="text-align:center;margin-top:20px;font-size:11px;color:#475569">🔐 Acceso seguro · Sin venta de datos · Cancela cuando quieras</div>
   </div>
 </div>
 
@@ -397,10 +302,7 @@ html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-
                   <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:9px 12px;margin-bottom:12px;display:flex;gap:8px;font-size:11px;color:rgba(255,255,255,.7);line-height:1.5"><span>⚠️</span><div><strong style="color:#F59E0B">Alerta 16:30h:</strong> Caída de energía en ~40 min.</div></div>
                   <svg width="100%" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
                     <defs><linearGradient id="pcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".3"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
-                    <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+                    <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="40" x2="300" y2="40" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="60" x2="300" y2="60" stroke="rgba(255,255,255,.05)" stroke-width="1"/><line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
                     <path d="M14,24 L58,30 L100,18 L142,32 L184,27 L184,88 L14,88 Z" fill="url(#pcg)"/>
                     <path d="M14,24 L58,30 L100,18 L142,32 L184,27" fill="none" stroke="#7C3AED" stroke-width="2.5" style="animation:lineGrow 1.5s ease forwards;stroke-dasharray:300;stroke-dashoffset:300"/>
                     <path d="M184,27 L232,58 L280,76" fill="none" stroke="#EC4899" stroke-width="2" stroke-dasharray="5 4" opacity=".8"/>
@@ -408,13 +310,7 @@ html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-
                     <rect x="170" y="5" width="28" height="11" rx="3" fill="#F59E0B"/>
                     <text x="184" y="13" font-size="6.5" fill="#000" text-anchor="middle" font-weight="700">AHORA</text>
                     <circle cx="184" cy="27" r="4.5" fill="#F59E0B" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="14" y="97" font-size="7.5" fill="#475569" text-anchor="middle">9h</text>
-                    <text x="58" y="97" font-size="7.5" fill="#475569" text-anchor="middle">11h</text>
-                    <text x="100" y="97" font-size="7.5" fill="#475569" text-anchor="middle">13h</text>
-                    <text x="142" y="97" font-size="7.5" fill="#475569" text-anchor="middle">15h</text>
-                    <text x="184" y="97" font-size="7.5" fill="#F59E0B" text-anchor="middle" font-weight="600">16h</text>
-                    <text x="232" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">17h</text>
-                    <text x="280" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">18h</text>
+                    <text x="14" y="97" font-size="7.5" fill="#475569" text-anchor="middle">9h</text><text x="58" y="97" font-size="7.5" fill="#475569" text-anchor="middle">11h</text><text x="100" y="97" font-size="7.5" fill="#475569" text-anchor="middle">13h</text><text x="142" y="97" font-size="7.5" fill="#475569" text-anchor="middle">15h</text><text x="184" y="97" font-size="7.5" fill="#F59E0B" text-anchor="middle" font-weight="600">16h</text><text x="232" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">17h</text><text x="280" y="97" font-size="7.5" fill="#EC4899" text-anchor="middle">18h</text>
                   </svg>
                 </div></div>
               </div>
@@ -590,13 +486,11 @@ html,body{height:100%;background:#0D1117;color:#F8FAFC;font-family:'Inter',sans-
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// AUTH SYSTEM
-// ═══════════════════════════════════════════════════
+// ── AUTH ──
 const ADMIN_EMAIL = 'dylanincrease@gmail.com';
-const ADMIN_PASS  = 'syncro2025';  // cambia esto antes de publicar
+const ADMIN_PASS  = 'syncro2025';
 let currentUser = null;
-let passVisible = false;
+let passVisible  = false;
 
 function togglePass(){
   const inp = document.getElementById('login-pass');
@@ -611,33 +505,22 @@ function doLogin(){
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
   const btn   = document.getElementById('login-btn');
-
   errEl.style.display = 'none';
-
-  if(!email || !pass){
-    showLoginError('Por favor completa todos los campos');
-    return;
-  }
-  if(!/\S+@\S+\.\S+/.test(email)){
-    showLoginError('El correo no es válido');
-    return;
-  }
-
+  if(!email || !pass){ showLoginError('Por favor completa todos los campos'); return; }
+  if(!/\S+@\S+\.\S+/.test(email)){ showLoginError('El correo no es válido'); return; }
   btn.textContent = 'Verificando…';
   btn.style.opacity = '.7';
-
   setTimeout(()=>{
     if(email === ADMIN_EMAIL.toLowerCase() && pass === ADMIN_PASS){
-      loginSuccess({ email, name: 'Dylan', role: 'admin' });
+      loginSuccess({ email, name:'Dylan', role:'admin' });
     } else if(email !== ADMIN_EMAIL.toLowerCase() && pass.length >= 6){
-      // Cualquier otro usuario válido
-      loginSuccess({ email, name: email.split('@')[0], role: 'user' });
+      loginSuccess({ email, name: email.split('@')[0], role:'user' });
     } else {
       btn.textContent = 'Iniciar sesión →';
       btn.style.opacity = '1';
       showLoginError('Correo o contraseña incorrectos');
       document.getElementById('login-screen').style.animation = 'shake .4s ease';
-      setTimeout(()=>document.getElementById('login-screen').style.animation = '',400);
+      setTimeout(()=>document.getElementById('login-screen').style.animation='',400);
     }
   }, 900);
 }
@@ -652,19 +535,12 @@ function loginSuccess(user){
   currentUser = user;
   try{ localStorage.setItem('sq_user', JSON.stringify(user)); }catch(e){}
   document.getElementById('login-btn').textContent = 'Iniciando…';
-  setTimeout(()=>{
-    hideLogin();
-    showApp(user);
-  }, 400);
+  setTimeout(()=>{ hideLogin(); showApp(user); }, 400);
 }
 
 function showApp(user){
-  const app = document.getElementById('app');
-  app.classList.add('visible');
-  // Update header chip
-  const initials = user.name ? user.name.substring(0,2).toUpperCase() : '?';
-  document.getElementById('user-chip').textContent = initials;
-  // Update profile page
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('user-chip').textContent = user.name ? user.name.substring(0,2).toUpperCase() : '?';
   document.getElementById('profile-name').textContent = user.name || 'Mi perfil';
   document.getElementById('profile-email-display').textContent = user.email;
   if(user.role === 'admin'){
@@ -674,13 +550,12 @@ function showApp(user){
 }
 
 function hideLogin(){
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('login-screen').style.display = 'none';
+  const ls = document.getElementById('login-screen');
+  ls.classList.add('hidden');
+  ls.style.display = 'none';
 }
 
-function googleLogin(){
-  showToast('🔄 Autenticación con Google próximamente');
-}
+function googleLogin(){ showToast('🔄 Autenticación con Google próximamente'); }
 
 function doLogout(){
   try{ localStorage.removeItem('sq_user'); }catch(e){}
@@ -697,28 +572,22 @@ function doLogout(){
   showToast('👋 Sesión cerrada');
 }
 
-// Allow Enter key on login
 document.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && document.getElementById('login-screen') && !document.getElementById('login-screen').classList.contains('hidden')){
-    doLogin();
-  }
+  if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin();
 });
 
-// ═══════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════
+// ── NAVEGACIÓN ──
 let currentTab = 'home';
 const tabAccents = {home:'#8B5CF6',demos:'#EC4899',planes:'#10B981',referidos:'#F59E0B',perfil:'#06B6D4'};
 
 function goTab(tab){
   if(tab === currentTab) return;
-  const cp = document.getElementById('page-'+currentTab);
-  cp.classList.remove('active');
+  document.getElementById('page-'+currentTab).classList.remove('active');
   const ct = document.getElementById('tab-'+currentTab);
-  if(ct){ ct.classList.remove('active'); ct.querySelector('.tab-label').style.color = ''; }
+  if(ct){ ct.classList.remove('active'); ct.querySelector('.tab-label').style.color=''; }
   currentTab = tab;
   const np = document.getElementById('page-'+tab);
-  np.classList.add('active'); np.scrollTop = 0;
+  np.classList.add('active'); np.scrollTop=0;
   const nt = document.getElementById('tab-'+tab);
   if(nt){
     nt.classList.add('active');
@@ -731,8 +600,8 @@ function goTab(tab){
 }
 
 // Swipe
-let tx=0,ty=0;
-const tabs=['home','demos','planes','referidos','perfil'];
+let tx=0, ty=0;
+const tabs = ['home','demos','planes','referidos','perfil'];
 document.getElementById('pages').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
 document.getElementById('pages').addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
@@ -743,36 +612,30 @@ document.getElementById('pages').addEventListener('touchend',e=>{
   }
 },{passive:true});
 
-// ═══════════════════════════════════════════════════
-// DEMO ACCORDION
-// ═══════════════════════════════════════════════════
+// ── DEMOS ACCORDION ──
 function toggleDemo(id){
   const el=document.getElementById(id), arrow=document.getElementById(id+'-arrow');
-  const isOpen=el.style.maxHeight&&el.style.maxHeight!=='0px';
+  const isOpen = el.style.maxHeight && el.style.maxHeight!=='0px';
   ['d1','d2','d3','d4','d5'].forEach(d=>{
     document.getElementById(d).style.maxHeight='0px';
     const a=document.getElementById(d+'-arrow');
     if(a){a.style.transform='rotate(0deg)';a.style.color='#64748B';}
   });
   if(!isOpen){
-    el.style.maxHeight=el.scrollHeight+300+'px';
+    el.style.maxHeight = el.scrollHeight+300+'px';
     arrow.style.transform='rotate(180deg)';
     arrow.style.color='#8B5CF6';
   }
 }
 
-// ═══════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════
+// ── TOAST ──
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ═══════════════════════════════════════════════════
-// COPY FUNCTIONS
-// ═══════════════════════════════════════════════════
+// ── COPIAR ──
 function copyRef(){
   navigator.clipboard?.writeText('https://syncroquantume.app/ref/TU-CODIGO').catch(()=>{});
   const btn=document.getElementById('refCopyBtn');
@@ -796,13 +659,12 @@ function shareOther(btn){
   setTimeout(()=>{btn.innerHTML=o},2500);
 }
 
-// ═══════════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════════
+// ── MODAL ──
 const modals = {
   settings:`<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:16px">⚙️ Ajustes</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)"><span style="font-size:13px">Notificaciones</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#10B981);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)"><span style="font-size:13px">Briefing 7:00 am</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#10B981,#06B6D4);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0"><span style="font-size:13px">Modo oscuro</span><div style="width:40px;height:22px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#EC4899);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff"></div></div></div></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#475569;text-align:center">Syncro Quantum v1.0 · © 2025</div>`,
   privacy:`<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px">🔐 Privacidad</div><div style="display:flex;flex-direction:column;gap:9px"><div style="padding:12px;background:rgba(99,179,237,.07);border:1px solid rgba(99,179,237,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#63B3ED">🔐 Cifrado E2E:</strong> Solo tú accedes a tu información.</div><div style="padding:12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#10B981">🚫 Sin venta:</strong> Nunca compartimos tus datos con terceros.</div><div style="padding:12px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:12px;font-size:12px;line-height:1.6;color:#CBD5E1"><strong style="color:#8B5CF6">🗑️ Borrado:</strong> Elimina todo cuando quieras, sin retención.</div></div>`
 };
+
 function openModal(type){
   document.getElementById('modal-content').innerHTML = modals[type]||'';
   document.getElementById('modal-overlay').classList.add('open');
@@ -811,30 +673,21 @@ function closeModal(e){
   if(e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
 }
 
-// ═══════════════════════════════════════════════════
-// PWA INSTALL
-// ═══════════════════════════════════════════════════
+// ── PWA INSTALL ──
 let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault(); deferredPrompt = e;
-});
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; });
+
 function installApp(){
   if(deferredPrompt){
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r=>{
-      if(r.outcome==='accepted') showToast('✅ App instalada correctamente');
-      deferredPrompt = null;
-    });
+    deferredPrompt.userChoice.then(r=>{ if(r.outcome==='accepted') showToast('✅ App instalada correctamente'); deferredPrompt=null; });
   } else {
-    openModal('install_hint');
     modals.install_hint = `<div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:14px">📲 Instalar app</div><div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><div style="padding:11px;background:rgba(255,255,255,.04);border-radius:11px;line-height:1.5"><strong style="color:#F8FAFC">iPhone / Safari:</strong><br><span style="color:#94A3B8">Toca ⬆ Compartir → "Añadir a inicio"</span></div><div style="padding:11px;background:rgba(255,255,255,.04);border-radius:11px;line-height:1.5"><strong style="color:#F8FAFC">Android / Chrome:</strong><br><span style="color:#94A3B8">Menú ⋮ → "Añadir a pantalla de inicio"</span></div></div>`;
     openModal('install_hint');
   }
 }
 
-// ═══════════════════════════════════════════════════
-// SERVICE WORKER + AUTO-UPDATE
-// ═══════════════════════════════════════════════════
+// ── SERVICE WORKER + AUTO-UPDATE ──
 let swReg = null;
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js')
@@ -848,58 +701,37 @@ if('serviceWorker' in navigator){
           }
         });
       });
-      // Revisar updates cada 30 min
       setInterval(()=>reg.update(), 30*60*1000);
     })
     .catch(()=>{});
 }
 function applyUpdate(){
-  if(swReg && swReg.waiting){
-    swReg.waiting.postMessage({type:'SKIP_WAITING'});
-  }
+  if(swReg && swReg.waiting) swReg.waiting.postMessage({type:'SKIP_WAITING'});
   showToast('🔄 Aplicando actualización…');
   setTimeout(()=>location.reload(),800);
 }
 navigator.serviceWorker?.addEventListener('controllerchange',()=>location.reload());
 
-// ═══════════════════════════════════════════════════
-// BOOT SEQUENCE
-// ═══════════════════════════════════════════════════
+// ── BOOT ──
 window.addEventListener('load',()=>{
   setTimeout(()=>{
-    // Check saved session
     let savedUser = null;
     try{ const s=localStorage.getItem('sq_user'); if(s) savedUser=JSON.parse(s); }catch(e){}
-
     const splash = document.getElementById('splash');
     splash.classList.add('hidden');
-
-    if(savedUser){
-      // Auto-login with saved session
-      currentUser = savedUser;
-      setTimeout(()=>{
-        splash.style.display='none';
+    setTimeout(()=>{
+      splash.style.display = 'none';
+      if(savedUser){
+        currentUser = savedUser;
         showApp(savedUser);
-      },300);
-    } else {
-      // Show login
-      setTimeout(()=>{
-        splash.style.display='none';
+      } else {
         const ls = document.getElementById('login-screen');
         ls.classList.remove('hidden');
-        ls.style.display='flex';
-      },300);
-    }
+        ls.style.display = 'flex';
+      }
+    },300);
   }, 2200);
 });
 </script>
-  <!-- SERVICIO PARA QUE SE DESBLOQUEE EL BOTÓN -->
-<script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js');
-    });
-}
-
 </body>
 </html>
