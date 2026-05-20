@@ -9,228 +9,178 @@
 <meta name="apple-mobile-web-app-title" content="Syncro Q"/>
 <link rel="manifest" href="/manifest.json"/>
 <title>Syncro Quantum</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:#000008;color:#F0F4FF;font-family:'Exo 2',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-/* ── CUSTOM CURSOR ── */
-#cursor{position:fixed;width:20px;height:20px;border:2px solid #00F5FF;border-radius:50%;pointer-events:none;z-index:99999;transition:transform .1s;mix-blend-mode:difference}
-#cursor-trail{position:fixed;width:8px;height:8px;background:#7C3AED;border-radius:50%;pointer-events:none;z-index:99998;transition:all .15s}
+/* ── GRID BG ── */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,255,.04)1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.04)1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
 
-/* ── CANVAS PARTICLES ── */
-#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-/* ── SCREENS ── */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:100;transition:opacity .5s ease,transform .5s ease}
-.screen.hidden{opacity:0;pointer-events:none;transform:scale(.95)}
-
-/* ── APP LAYOUT ── */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;opacity:0;transition:opacity .5s ease;z-index:10}
+/* ── APP ── */
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;z-index:1;opacity:0;transition:opacity .4s}
 #app.visible{opacity:1}
 
-/* ── SCANLINES ── */
-#app::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,245,255,.01) 2px,rgba(0,245,255,.01) 4px);pointer-events:none;z-index:1;animation:scanlines 8s linear infinite}
-@keyframes scanlines{0%{background-position:0 0}100%{background-position:0 100px}}
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:100;background:#000008;transition:opacity .4s,transform .4s}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(.96)}
 
 /* ── HEADER ── */
-#header{flex-shrink:0;padding:10px 16px 8px;background:rgba(0,0,8,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,245,255,.15);display:flex;align-items:center;justify-content:space-between;z-index:100;position:relative}
-#header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF,#7C3AED,transparent);animation:headerGlow 3s ease-in-out infinite}
-@keyframes headerGlow{0%,100%{opacity:.5}50%{opacity:1}}
+#header{flex-shrink:0;padding:10px 16px;background:rgba(0,0,8,.95);border-bottom:1px solid rgba(0,245,255,.12);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+#header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF88,#7C3AED88,transparent)}
 .hlogo{display:flex;align-items:center;gap:8px}
-.hlogo-sq{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:11px;color:#000;position:relative;overflow:hidden}
-.hlogo-sq::after{content:'';position:absolute;inset:-100%;background:linear-gradient(45deg,transparent,rgba(255,255,255,.3),transparent);animation:shine 3s ease-in-out infinite}
-@keyframes shine{0%,100%{transform:translateX(-100%) rotate(45deg)}50%{transform:translateX(200%) rotate(45deg)}}
-.hlogo-name{font-family:'Orbitron',sans-serif;font-weight:800;font-size:13px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.hlogo-sq{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:10px;color:#000;letter-spacing:-1px}
+.hlogo-name{font-family:'Orbitron',sans-serif;font-weight:900;font-size:12px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
 .hright{display:flex;align-items:center;gap:8px}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#00FF88;box-shadow:0 0 8px #00FF88;animation:livePulse 1.5s ease-in-out infinite}
-@keyframes livePulse{0%,100%{transform:scale(1);box-shadow:0 0 8px #00FF88}50%{transform:scale(1.4);box-shadow:0 0 16px #00FF88,0 0 24px #00FF8866}}
-.user-chip{font-size:10px;color:#00F5FF;background:rgba(0,245,255,.08);padding:4px 10px;border-radius:6px;border:1px solid rgba(0,245,255,.2);font-family:'Orbitron',sans-serif;letter-spacing:1px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#00FF88;box-shadow:0 0 8px #00FF88;animation:pulse 1.5s ease-in-out infinite}
 
 /* ── PAGES ── */
-#pages{flex:1;overflow:hidden;position:relative;z-index:2}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(24px);transition:opacity .3s ease,transform .3s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:translateX(0)}
-.page-inner{padding:16px 16px 100px}
+.page-inner{padding:14px 14px 90px}
 
-/* ── TAB BAR ── */
-#tabbar{flex-shrink:0;display:flex;background:rgba(0,0,8,.95);backdrop-filter:blur(24px);border-top:1px solid rgba(0,245,255,.1);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:100;position:relative}
-#tabbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF44,#7C3AED44,#FF006E44,transparent)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:none;background:none;cursor:pointer;border-radius:10px;transition:all .2s;position:relative}
-.tab:active{background:rgba(0,245,255,.05)}
-.tab-icon{font-size:18px;transition:transform .2s;filter:grayscale(1) opacity(.5)}
+/* ── TABBAR ── */
+#tabbar{flex-shrink:0;display:flex;background:rgba(0,0,8,.97);border-top:1px solid rgba(0,245,255,.1);padding:6px 2px calc(6px + env(safe-area-inset-bottom));position:relative;z-index:10}
+#tabbar::before{content:'';position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF44,#7C3AED44,transparent)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border:none;background:none;cursor:pointer;border-radius:8px;position:relative}
+.tab-icon{font-size:18px;filter:grayscale(1)opacity(.4);transition:all .2s}
 .tab.active .tab-icon{filter:none;transform:scale(1.15)}
-.tab-label{font-size:9px;font-weight:600;color:#475569;transition:color .2s;font-family:'Orbitron',sans-serif;letter-spacing:.5px}
+.tab-label{font-size:9px;color:#334155;font-family:'Orbitron',sans-serif;letter-spacing:.3px;transition:color .2s}
 .tab.active .tab-label{color:#00F5FF}
-.tab-glow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;border-radius:2px;opacity:0;transition:opacity .2s}
-.tab.active .tab-glow{opacity:1}
-.tab-badge{position:absolute;top:3px;right:calc(50% - 14px);width:7px;height:7px;border-radius:50%;background:#FF006E;border:1.5px solid #000008;display:none;box-shadow:0 0 8px #FF006E}
+.tab-line{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:16px;height:2px;border-radius:2px;opacity:0;transition:opacity .2s}
+.tab.active .tab-line{opacity:1}
+.tab-badge{position:absolute;top:2px;right:calc(50% - 14px);width:7px;height:7px;border-radius:50%;background:#FF006E;border:1.5px solid #000008;display:none;box-shadow:0 0 6px #FF006E}
 .tab-badge.show{display:block}
 
 /* ── CARDS ── */
-.card{background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.1);border-radius:16px;transition:all .3s;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,245,255,.03),transparent);pointer-events:none}
-.card:hover{border-color:rgba(0,245,255,.25);box-shadow:0 0 20px rgba(0,245,255,.08),inset 0 0 20px rgba(0,245,255,.03)}
-.card-v{background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.15);border-radius:16px}
-.glass{background:rgba(0,0,20,.7);border:1px solid rgba(0,245,255,.12);border-radius:16px;backdrop-filter:blur(20px)}
+.card{background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.1);border-radius:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,245,255,.02),transparent);pointer-events:none}
 
 /* ── BUTTONS ── */
-.btn-primary{display:block;text-align:center;padding:14px;border-radius:12px;background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;position:relative;overflow:hidden;transition:all .2s;width:100%;text-transform:uppercase}
-.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);opacity:0;transition:opacity .2s}
-.btn-primary:hover::before{opacity:1}
-.btn-primary:active{transform:scale(.97)}
-.btn-cyan{display:block;text-align:center;padding:13px;border-radius:12px;background:linear-gradient(135deg,#00F5FF,#00FF88);color:#000;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;width:100%;text-transform:uppercase;transition:transform .15s}
-.btn-cyan:active{transform:scale(.97)}
-.btn-out{display:block;text-align:center;padding:12px;border-radius:12px;background:transparent;color:#00F5FF;font-size:12px;font-weight:700;text-decoration:none;border:1.5px solid rgba(0,245,255,.3);cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.5px;transition:all .2s;width:100%;text-transform:uppercase}
-.btn-out:hover{background:rgba(0,245,255,.05);border-color:#00F5FF;box-shadow:0 0 16px rgba(0,245,255,.2)}
+.btn-p{display:block;text-align:center;padding:13px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#FF006E);color:#fff;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:transform .15s;width:100%;box-shadow:0 4px 16px rgba(124,58,237,.3)}
+.btn-p:active{transform:scale(.97)}
+.btn-c{display:block;text-align:center;padding:12px;border-radius:10px;background:linear-gradient(135deg,#00FF88,#00F5FF);color:#000;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:transform .15s;width:100%;box-shadow:0 4px 16px rgba(0,255,136,.2)}
+.btn-c:active{transform:scale(.97)}
+.btn-o{display:block;text-align:center;padding:11px;border-radius:10px;background:transparent;color:#00F5FF;font-size:11px;font-weight:700;text-decoration:none;border:1.5px solid rgba(0,245,255,.25);cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;width:100%}
+.btn-o:active{background:rgba(0,245,255,.06)}
+.input{width:100%;background:rgba(0,245,255,.04);border:1.5px solid rgba(0,245,255,.12);border-radius:10px;padding:12px 14px;color:#F0F4FF;font-size:13px;outline:none;font-family:'Exo 2',sans-serif;transition:border-color .2s}
+.input:focus{border-color:#00F5FF;background:rgba(0,245,255,.07)}
+.input::placeholder{color:#1e293b}
 
-/* ── INPUT ── */
-.input{width:100%;background:rgba(0,245,255,.04);border:1.5px solid rgba(0,245,255,.15);border-radius:10px;padding:12px 14px;color:#F0F4FF;font-size:13px;outline:none;font-family:'Exo 2',sans-serif;transition:all .2s}
-.input:focus{border-color:#00F5FF;background:rgba(0,245,255,.08);box-shadow:0 0 20px rgba(0,245,255,.1)}
-.input::placeholder{color:#334155}
-
-/* ── SECTION STYLES ── */
-.sec-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:4px;margin-bottom:10px;font-family:'Orbitron',sans-serif}
-.ttl{font-family:'Orbitron',sans-serif;font-size:clamp(18px,4.5vw,24px);font-weight:900;line-height:1.2;margin-bottom:7px;letter-spacing:.5px}
-.sub{font-size:13px;color:#64748B;line-height:1.75;margin-bottom:20px}
-
-/* ── GLOW EFFECTS ── */
-.glow-cyan{box-shadow:0 0 20px rgba(0,245,255,.3),0 0 40px rgba(0,245,255,.1)}
-.glow-v{box-shadow:0 0 20px rgba(124,58,237,.4),0 0 40px rgba(124,58,237,.15)}
-.glow-pink{box-shadow:0 0 20px rgba(255,0,110,.3)}
-.text-cyan{background:linear-gradient(90deg,#00F5FF,#00FF88);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.text-v{background:linear-gradient(90deg,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.text-glow{text-shadow:0 0 20px rgba(0,245,255,.5)}
+/* ── TAGS ── */
+.tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:8px;font-family:'Orbitron',sans-serif}
+.ttl{font-family:'Orbitron',sans-serif;font-size:clamp(17px,4vw,22px);font-weight:900;line-height:1.2;margin-bottom:6px;letter-spacing:.5px}
+.sub{font-size:12px;color:#475569;line-height:1.7;margin-bottom:18px}
 
 /* ── ANIMATIONS ── */
-@keyframes glitch{0%,100%{transform:translate(0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.2);opacity:.1}}
-@keyframes wave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
-@keyframes scan{0%{top:0;opacity:1}80%{opacity:.8}100%{top:100%;opacity:0}}
+@keyframes scan{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
 @keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
-@keyframes rgbShift{0%{text-shadow:2px 0 #FF006E,-2px 0 #00F5FF}33%{text-shadow:-2px 0 #7C3AED,2px 0 #00FF88}66%{text-shadow:2px 0 #00F5FF,-2px 0 #FF006E}100%{text-shadow:2px 0 #FF006E,-2px 0 #00F5FF}}
-@keyframes borderPulse{0%,100%{border-color:rgba(0,245,255,.2)}50%{border-color:rgba(0,245,255,.6)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes glow-anim{0%,100%{box-shadow:0 0 20px rgba(124,58,237,.4)}50%{box-shadow:0 0 40px rgba(124,58,237,.8),0 0 60px rgba(0,245,255,.3)}}
+@keyframes glow{0%,100%{box-shadow:0 0 14px rgba(124,58,237,.4)}50%{box-shadow:0 0 28px rgba(124,58,237,.7),0 0 40px rgba(0,245,255,.2)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rgb{0%,100%{background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E)}33%{background:linear-gradient(90deg,#FF006E,#00F5FF,#7C3AED)}66%{background:linear-gradient(90deg,#7C3AED,#FF006E,#00F5FF)}}
+@keyframes borderPulse{0%,100%{border-color:rgba(0,245,255,.12)}50%{border-color:rgba(0,245,255,.35)}}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,20,.95);color:#00F5FF;padding:9px 20px;border-radius:8px;font-size:11px;font-weight:700;z-index:9999;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(0,245,255,.3);box-shadow:0 0 20px rgba(0,245,255,.2);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
+#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,20,.95);color:#00F5FF;padding:8px 18px;border-radius:6px;font-size:10px;font-weight:700;z-index:999;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(0,245,255,.25);box-shadow:0 0 16px rgba(0,245,255,.15);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
 #toast.show{opacity:1}
 
 /* UPDATE BANNER */
-#update-banner{position:fixed;bottom:80px;left:12px;right:12px;background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:12px 16px;border-radius:12px;z-index:9999;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
+#update-banner{position:fixed;bottom:78px;left:10px;right:10px;background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:11px 14px;border-radius:10px;z-index:998;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:800;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
 #update-banner.show{transform:translateY(0)}
-.update-btn{background:rgba(0,0,0,.3);color:#000;border:none;border-radius:6px;padding:5px 12px;font-weight:900;cursor:pointer;font-size:11px;font-family:'Orbitron',sans-serif}
+.upd-btn{background:rgba(0,0,0,.25);color:#000;border:none;border-radius:5px;padding:5px 11px;font-weight:900;cursor:pointer;font-size:10px;font-family:'Orbitron',sans-serif}
 
 /* MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,8,.85);backdrop-filter:blur(12px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,8,.85);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 #modal-overlay.open{opacity:1;pointer-events:all}
-#modal{background:#000810;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;border:1px solid rgba(0,245,255,.15);border-bottom:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1)}
-#modal-overlay.open #modal{transform:translateY(0)}
+#modal{background:#00030f;border-radius:18px 18px 0 0;padding:22px 18px 36px;width:100%;max-width:500px;border:1px solid rgba(0,245,255,.12);border-bottom:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1);position:relative}
 #modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF,#7C3AED,transparent)}
+#modal-overlay.open #modal{transform:translateY(0)}
 </style>
 </head>
 <body>
 
-<!-- PARTICLES CANVAS -->
-<canvas id="particles"></canvas>
-
-<!-- CURSOR -->
-<div id="cursor"></div>
-<div id="cursor-trail"></div>
-
-<!-- ══════ SPLASH ══════ -->
-<div id="splash" class="screen" style="background:#000008;z-index:999">
-  <div style="position:relative;text-align:center">
-    <!-- Quantum rings -->
-    <div style="position:relative;width:160px;height:160px;margin:0 auto 24px">
-      <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(0,245,255,.3);animation:spin 4s linear infinite"></div>
-      <div style="position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(124,58,237,.4);animation:spinR 3s linear infinite"></div>
-      <div style="position:absolute;inset:24px;border-radius:50%;border:1px solid rgba(255,0,110,.3);animation:spin 6s linear infinite"></div>
-      <div style="position:absolute;inset:36px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.15),transparent);animation:pulse 2s ease-in-out infinite"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-        <div style="font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:rgbShift 2s ease-in-out infinite">SQ</div>
+<!-- ══ SPLASH ══ -->
+<div id="splash" class="screen">
+  <div style="text-align:center">
+    <div style="position:relative;width:120px;height:120px;margin:0 auto 20px">
+      <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.4);animation:spin 4s linear infinite"></div>
+      <div style="position:absolute;inset:10px;border-radius:50%;border:1px solid rgba(124,58,237,.5);animation:spinR 3s linear infinite"></div>
+      <div style="position:absolute;inset:20px;border-radius:50%;border:1px solid rgba(255,0,110,.35);animation:spin 6s linear infinite"></div>
+      <div style="position:absolute;inset:30px;border-radius:50%;background:rgba(0,245,255,.06);display:flex;align-items:center;justify-content:center">
+        <span style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
       </div>
-      <!-- Orbiting dots -->
-      <div style="position:absolute;width:8px;height:8px;border-radius:50%;background:#00F5FF;box-shadow:0 0 12px #00F5FF;top:0;left:50%;transform:translateX(-50%);animation:orbit1 3s linear infinite"></div>
-      <div style="position:absolute;width:6px;height:6px;border-radius:50%;background:#FF006E;box-shadow:0 0 10px #FF006E;bottom:12px;right:12px;animation:orbit2 4s linear infinite"></div>
     </div>
-    <div style="font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;animation:rgbShift 3s ease-in-out infinite">SYNCRO QUANTUM</div>
-    <div style="font-size:11px;color:#334155;letter-spacing:4px;text-transform:uppercase;font-family:'Orbitron',sans-serif;margin-bottom:24px">ADAPTIVE INTELLIGENCE</div>
-    <!-- Loading bar -->
-    <div style="width:200px;height:2px;background:rgba(0,245,255,.1);border-radius:2px;margin:0 auto;overflow:hidden">
-      <div id="load-bar" style="height:100%;width:0;background:linear-gradient(90deg,#7C3AED,#00F5FF,#FF006E);border-radius:2px;transition:width .1s linear;box-shadow:0 0 10px #00F5FF"></div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">SYNCRO QUANTUM</div>
+    <div style="font-size:9px;color:#1e293b;letter-spacing:4px;font-family:'Orbitron',sans-serif;margin-bottom:20px">ADAPTIVE INTELLIGENCE</div>
+    <div style="width:160px;height:2px;background:rgba(0,245,255,.08);border-radius:2px;margin:0 auto;overflow:hidden">
+      <div id="lbar" style="height:100%;width:0;background:linear-gradient(90deg,#7C3AED,#00F5FF);border-radius:2px;transition:width .08s linear;box-shadow:0 0 8px #00F5FF"></div>
     </div>
-    <div style="font-size:10px;color:#334155;margin-top:8px;font-family:'Orbitron',sans-serif;letter-spacing:2px" id="load-text">INICIANDO...</div>
+    <div id="ltxt" style="font-size:9px;color:#1e293b;margin-top:7px;font-family:'Orbitron',sans-serif;letter-spacing:2px">INICIANDO...</div>
   </div>
 </div>
 
-<!-- ══════ LOGIN ══════ -->
-<div id="login-screen" class="screen hidden" style="background:#000008;overflow-y:auto">
-  <canvas id="login-particles" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
-  <div style="width:100%;max-width:360px;position:relative;z-index:1">
-    <div style="text-align:center;margin-bottom:28px">
-      <!-- Logo -->
-      <div style="position:relative;width:80px;height:80px;margin:0 auto 16px">
-        <div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(0,245,255,.4);animation:spin 4s linear infinite"></div>
-        <div style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(124,58,237,.5);animation:spinR 3s linear infinite"></div>
-        <div style="position:absolute;inset:12px;border-radius:50%;background:linear-gradient(135deg,rgba(0,245,255,.1),rgba(124,58,237,.1));display:flex;align-items:center;justify-content:center">
-          <span style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
+<!-- ══ LOGIN ══ -->
+<div id="login-screen" class="screen hidden" style="overflow-y:auto">
+  <div style="width:100%;max-width:340px;position:relative;z-index:1;padding:10px 0">
+    <div style="text-align:center;margin-bottom:22px">
+      <div style="position:relative;width:70px;height:70px;margin:0 auto 14px">
+        <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.35);animation:spin 4s linear infinite"></div>
+        <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(124,58,237,.4);animation:spinR 3s linear infinite"></div>
+        <div style="position:absolute;inset:16px;border-radius:50%;background:rgba(0,245,255,.06);display:flex;align-items:center;justify-content:center">
+          <span style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
         </div>
       </div>
-      <div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;letter-spacing:2px;margin-bottom:4px;animation:rgbShift 4s ease-in-out infinite">ACCESO AL SISTEMA</div>
-      <div style="font-size:11px;color:#334155;letter-spacing:3px;font-family:'Orbitron',sans-serif">SYNCRO QUANTUM v1.0</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;margin-bottom:3px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">ACCESO AL SISTEMA</div>
+      <div style="font-size:10px;color:#1e293b;letter-spacing:2px;font-family:'Orbitron',sans-serif">SYNCRO QUANTUM v1.0</div>
     </div>
 
-    <!-- Scan line effect on form -->
-    <div style="background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.15);border-radius:16px;padding:24px;position:relative;overflow:hidden;animation:borderPulse 3s ease-in-out infinite">
-      <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,.4),transparent);animation:scan 3s ease-in-out infinite"></div>
+    <div style="background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.12);border-radius:14px;padding:20px;position:relative;overflow:hidden;animation:borderPulse 3s ease-in-out infinite">
+      <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,.3),transparent);animation:scan 3s ease-in-out infinite"></div>
 
-      <div style="margin-bottom:14px">
-        <div style="font-size:10px;color:#00F5FF;margin-bottom:6px;font-family:'Orbitron',sans-serif;letter-spacing:1px">ID DE USUARIO</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:9px;color:#00F5FF;margin-bottom:5px;font-family:'Orbitron',sans-serif;letter-spacing:1px">ID DE USUARIO</div>
         <input id="login-email" class="input" type="email" placeholder="usuario@sistema.com" autocomplete="email"/>
       </div>
-      <div style="margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:10px;color:#00F5FF;font-family:'Orbitron',sans-serif;letter-spacing:1px">CLAVE DE ACCESO</span>
-          <span style="font-size:10px;color:#7C3AED;cursor:pointer;font-family:'Orbitron',sans-serif" onclick="showToast('📧 Revisa tu correo')">¿OLVIDASTE?</span>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:9px;color:#00F5FF;font-family:'Orbitron',sans-serif;letter-spacing:1px">CLAVE DE ACCESO</span>
+          <span style="font-size:9px;color:#7C3AED;cursor:pointer;font-family:'Orbitron',sans-serif" onclick="showToast('REVISA TU CORREO')">¿OLVIDASTE?</span>
         </div>
         <div style="position:relative">
-          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px"/>
-          <button onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#334155;cursor:pointer;font-size:14px" id="eye-btn">👁</button>
+          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:40px"/>
+          <button onclick="togglePass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#334155;cursor:pointer;font-size:14px" id="eye-btn">👁</button>
         </div>
       </div>
 
-      <div id="login-error" style="display:none;background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:#FF006E;margin-bottom:12px;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:.5px"></div>
+      <div id="login-error" style="display:none;background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.25);border-radius:7px;padding:7px 11px;font-size:10px;color:#FF006E;margin-bottom:11px;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:.5px"></div>
 
-      <button onclick="doLogin()" id="login-btn" class="btn-primary" style="margin-bottom:12px;box-shadow:0 0 20px rgba(0,245,255,.2)">
-        ⚡ INICIAR SESIÓN
-      </button>
+      <button onclick="doLogin()" id="login-btn" class="btn-p" style="margin-bottom:10px">⚡ INICIAR SESIÓN</button>
 
-      <div style="text-align:center;font-size:11px;color:#334155;margin-bottom:16px;font-family:'Orbitron',sans-serif">
+      <div style="text-align:center;font-size:10px;color:#1e293b;margin-bottom:14px;font-family:'Orbitron',sans-serif">
         ¿SIN CUENTA? <span style="color:#00F5FF;cursor:pointer" onclick="goTab('planes');hideLogin()">ACCESO GRATUITO →</span>
       </div>
 
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="flex:1;height:1px;background:rgba(0,245,255,.1)"></div>
-        <span style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">O CONTINÚA</span>
-        <div style="flex:1;height:1px;background:rgba(0,245,255,.1)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+        <div style="flex:1;height:1px;background:rgba(0,245,255,.08)"></div>
+        <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">O CONTINÚA</span>
+        <div style="flex:1;height:1px;background:rgba(0,245,255,.08)"></div>
       </div>
 
-      <button onclick="googleLogin()" style="width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#F0F4FF;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Exo 2',sans-serif">
+      <button onclick="googleLogin()" style="width:100%;padding:11px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#F0F4FF;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Exo 2',sans-serif">
         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
         Continuar con Google
       </button>
     </div>
-    <div style="text-align:center;margin-top:14px;font-size:10px;color:#1e293b;font-family:'Orbitron',sans-serif;letter-spacing:1px">🔐 CIFRADO CUÁNTICO · SIN VENTA DE DATOS</div>
+    <div style="text-align:center;margin-top:12px;font-size:9px;color:#0f172a;font-family:'Orbitron',sans-serif;letter-spacing:1px">🔐 CIFRADO CUÁNTICO · SIN VENTA DE DATOS</div>
   </div>
 </div>
 
-<!-- ══════ MAIN APP ══════ -->
+<!-- ══ APP ══ -->
 <div id="app">
   <div id="header">
     <div class="hlogo">
@@ -239,263 +189,134 @@ html,body{height:100%;background:#000008;color:#F0F4FF;font-family:'Exo 2',sans-
     </div>
     <div class="hright">
       <div class="live-dot"></div>
-      <span id="user-chip" class="user-chip"></span>
+      <span id="user-chip" style="font-size:10px;color:#00F5FF;background:rgba(0,245,255,.07);padding:3px 9px;border-radius:5px;border:1px solid rgba(0,245,255,.15);font-family:'Orbitron',sans-serif;letter-spacing:.5px"></span>
       <button style="background:none;border:none;color:#334155;font-size:16px;cursor:pointer" onclick="openModal('settings')">⚙️</button>
     </div>
   </div>
 
   <div id="pages">
 
-    <!-- ═══ HOME ═══ -->
+    <!-- HOME -->
     <div class="page active" id="page-home">
       <div class="page-inner">
-        <!-- Hero -->
-        <div style="text-align:center;padding:12px 0 20px;position:relative">
-          <div style="position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(0,245,255,.08),transparent);border-radius:50%;top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
-
-          <!-- Quantum logo -->
-          <div style="position:relative;width:100px;height:100px;margin:0 auto 16px;animation:float 4s ease-in-out infinite">
-            <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.4);animation:spin 5s linear infinite"></div>
-            <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(124,58,237,.5);animation:spinR 4s linear infinite"></div>
-            <div style="position:absolute;inset:16px;border-radius:50%;border:1px solid rgba(255,0,110,.3);animation:spin 7s linear infinite"></div>
-            <div style="position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.2),rgba(124,58,237,.1));display:flex;align-items:center;justify-content:center">
-              <span style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
+        <div style="text-align:center;padding:10px 0 18px">
+          <div style="position:relative;width:90px;height:90px;margin:0 auto 14px">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.35);animation:spin 5s linear infinite"></div>
+            <div style="position:absolute;inset:9px;border-radius:50%;border:1px solid rgba(124,58,237,.4);animation:spinR 4s linear infinite"></div>
+            <div style="position:absolute;inset:18px;border-radius:50%;background:rgba(0,245,255,.05);display:flex;align-items:center;justify-content:center">
+              <span style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
             </div>
-            <!-- Orbiting dots -->
-            <div style="position:absolute;width:7px;height:7px;border-radius:50%;background:#00F5FF;box-shadow:0 0 10px #00F5FF;animation:orbitA 3s linear infinite;top:0;left:50%;transform:translateX(-50%)"></div>
-            <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:#FF006E;box-shadow:0 0 8px #FF006E;animation:orbitB 4s linear infinite;bottom:8px;right:8px"></div>
-            <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:#7C3AED;box-shadow:0 0 8px #7C3AED;animation:orbitC 5s linear infinite;top:50%;left:0"></div>
           </div>
-
-          <div id="home-greeting" style="font-family:'Orbitron',sans-serif;font-size:clamp(16px,4vw,22px);font-weight:900;line-height:1.2;margin-bottom:8px;letter-spacing:1px">
-            TU VIDA,<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:rgbShift 4s ease-in-out infinite">OPTIMIZADA POR IA.</span>
+          <div id="home-greeting" style="font-family:'Orbitron',sans-serif;font-size:clamp(16px,4vw,20px);font-weight:900;line-height:1.2;margin-bottom:7px;letter-spacing:.5px">
+            TU VIDA,<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">OPTIMIZADA POR IA.</span>
           </div>
-          <p style="font-size:13px;color:#475569;line-height:1.75;margin-bottom:16px;max-width:280px;margin-left:auto;margin-right:auto">La IA que te conoce mejor que tú mismo. Predice, actúa y mejora — antes de que lo necesites.</p>
-
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn-primary" onclick="goTab('demos')" style="box-shadow:0 0 24px rgba(0,245,255,.25)">🎬 VER DEMOS EN VIVO</button>
-            <button class="btn-out" onclick="goTab('planes')">VER PLANES Y PRECIOS →</button>
+          <p style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:14px;max-width:270px;margin-left:auto;margin-right:auto">La IA que te conoce mejor que tú mismo. Predice, actúa y mejora — antes de que lo necesites.</p>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <button class="btn-p" onclick="goTab('demos')">🎬 VER DEMOS EN VIVO</button>
+            <button class="btn-o" onclick="goTab('planes')">VER PLANES Y PRECIOS →</button>
           </div>
         </div>
 
-        <!-- Stats -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">
-          <div class="card" style="padding:12px;text-align:center">
-            <div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900" class="text-cyan">12K+</div>
-            <div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">USUARIOS</div>
-          </div>
-          <div class="card" style="padding:12px;text-align:center">
-            <div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;background:linear-gradient(90deg,#FF006E,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div>
-            <div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RATING</div>
-          </div>
-          <div class="card" style="padding:12px;text-align:center">
-            <div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">98%</div>
-            <div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RENUEVAN</div>
-          </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#00F5FF,#00FF88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">12K+</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">USUARIOS</div></div>
+          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#FF006E,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RATING</div></div>
+          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">98%</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RENUEVAN</div></div>
         </div>
 
-        <!-- Features -->
-        <div style="font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">MÓDULOS ACTIVOS</div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')">
-            <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,245,255,.08);border:1px solid rgba(0,245,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🧠</div>
-            <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:1px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">COACH IA 24/7</div><div style="font-size:11px;color:#475569">Responde con contexto real sobre tu vida</div></div>
-            <span style="color:#00F5FF;font-size:14px">›</span>
-          </div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')">
-            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📷</div>
-            <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:1px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">BIO-SCANNER</div><div style="font-size:11px;color:#475569">Detecta estrés y energía por cámara</div></div>
-            <span style="color:#FF006E;font-size:14px">›</span>
-          </div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')">
-            <div style="width:36px;height:36px;border-radius:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔮</div>
-            <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:1px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">PREDICCIÓN CUÁNTICA</div><div style="font-size:11px;color:#475569">Tu estado, predicho hora por hora</div></div>
-            <span style="color:#7C3AED;font-size:14px">›</span>
-          </div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')">
-            <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🌙</div>
-            <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:1px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">DREAM ARCHITECT</div><div style="font-size:11px;color:#475569">Tu día preparado mientras duermes</div></div>
-            <span style="color:#00FF88;font-size:14px">›</span>
-          </div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;color:#1e293b;text-transform:uppercase;letter-spacing:2px;margin-bottom:9px">MÓDULOS ACTIVOS</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px">
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🧠</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">COACH IA 24/7</div><div style="font-size:11px;color:#475569">Responde con contexto real</div></div><span style="color:#00F5FF;font-size:13px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(255,0,110,.07);border:1px solid rgba(255,0,110,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">BIO-SCANNER</div><div style="font-size:11px;color:#475569">Detecta estrés por cámara</div></div><span style="color:#FF006E;font-size:13px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔮</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">PREDICCIÓN CUÁNTICA</div><div style="font-size:11px;color:#475569">Tu estado, hora por hora</div></div><span style="color:#7C3AED;font-size:13px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🌙</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">DREAM ARCHITECT</div><div style="font-size:11px;color:#475569">Tu día preparado al despertar</div></div><span style="color:#00FF88;font-size:13px">›</span></div>
         </div>
 
-        <!-- Testimonials -->
-        <div style="font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">REPORTES DE USUARIOS</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="card" style="padding:12px 14px">
-            <div style="color:#F59E0B;font-size:10px;margin-bottom:5px;letter-spacing:2px">★★★★★</div>
-            <div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:8px;font-style:italic">"Me dice lo que necesito escuchar antes de que yo lo sepa. Increíble."</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <div style="width:24px;height:24px;border-radius:6px;background:rgba(0,245,255,.1);border:1px solid rgba(0,245,255,.2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#00F5FF;font-family:'Orbitron',sans-serif">MS</div>
-              <div style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">MARIANA S. · PLAN CREATIVA</div>
-            </div>
-          </div>
-          <div class="card" style="padding:12px 14px">
-            <div style="color:#F59E0B;font-size:10px;margin-bottom:5px;letter-spacing:2px">★★★★★</div>
-            <div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:8px;font-style:italic">"Ahorré más en el primer mes que en todo el año anterior."</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <div style="width:24px;height:24px;border-radius:6px;background:rgba(255,0,110,.1);border:1px solid rgba(255,0,110,.2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#FF006E;font-family:'Orbitron',sans-serif">JR</div>
-              <div style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">JORGE R. · PLAN INTELIGENTE</div>
-            </div>
-          </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="card" style="padding:11px 13px"><div style="color:#F59E0B;font-size:10px;margin-bottom:4px;letter-spacing:2px">★★★★★</div><div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:7px;font-style:italic">"Me dice lo que necesito escuchar antes de que yo lo sepa."</div><div style="display:flex;gap:7px;align-items:center"><div style="width:22px;height:22px;border-radius:5px;background:rgba(0,245,255,.1);border:1px solid rgba(0,245,255,.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#00F5FF;font-family:'Orbitron',sans-serif">MS</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">MARIANA S. · PLAN CREATIVA</div></div></div>
+          <div class="card" style="padding:11px 13px"><div style="color:#F59E0B;font-size:10px;margin-bottom:4px;letter-spacing:2px">★★★★★</div><div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:7px;font-style:italic">"Ahorré más en el primer mes que en todo el año anterior."</div><div style="display:flex;gap:7px;align-items:center"><div style="width:22px;height:22px;border-radius:5px;background:rgba(255,0,110,.1);border:1px solid rgba(255,0,110,.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#FF006E;font-family:'Orbitron',sans-serif">JR</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">JORGE R. · PLAN INTELIGENTE</div></div></div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ DEMOS ═══ -->
+    <!-- DEMOS -->
     <div class="page" id="page-demos">
       <div class="page-inner">
-        <div style="margin-bottom:18px">
-          <div class="sec-tag" style="background:rgba(124,58,237,.1);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">MÓDULOS ACTIVOS</div>
-          <div class="ttl">MÍRALO FUNCIONAR<br><span class="text-cyan">EN TIEMPO REAL</span></div>
-          <div class="sub">Toca cada módulo para expandirlo y ver la demo en vivo.</div>
+        <div style="margin-bottom:16px">
+          <div class="tag" style="background:rgba(124,58,237,.1);color:#7C3AED;border:1px solid rgba(124,58,237,.2)">MÓDULOS EN VIVO</div>
+          <div class="ttl">MÍRALO FUNCIONAR<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">EN TIEMPO REAL</span></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:9px">
 
-          <!-- Demo 1 -->
-          <div class="card" style="padding:0;overflow:hidden;animation:borderPulse 4s ease-in-out infinite">
-            <div style="padding:13px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d1')">
-              <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(0,245,255,.1));border:1px solid rgba(0,245,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;margin-bottom:1px">COACH IA EN VIVO</div><div style="font-size:11px;color:#475569">Conversación real con contexto</div></div>
-              <span id="d1-arrow" style="color:#00F5FF;font-size:12px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
+          <div class="card" style="overflow:hidden">
+            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d1')">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>
+              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">COACH IA EN VIVO</div><div style="font-size:10px;color:#475569;margin-top:1px">Conversación real con contexto</div></div>
+              <span id="d1-arrow" style="color:#00F5FF;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
             </div>
             <div id="d1" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 13px 13px">
-                <div style="border-radius:12px;overflow:hidden;border:1px solid rgba(0,245,255,.15)">
-                  <div style="height:28px;background:#000810;display:flex;align-items:center;padding:0 10px;gap:5px;border-bottom:1px solid rgba(0,245,255,.1)">
-                    <div style="width:8px;height:8px;border-radius:50%;background:#FF5F57"></div><div style="width:8px;height:8px;border-radius:50%;background:#FFBD2E"></div><div style="width:8px;height:8px;border-radius:50%;background:#28C840"></div>
-                    <span style="margin-left:6px;font-size:9px;color:#334155;font-family:'Orbitron',sans-serif">COACH · ONLINE</span>
-                    <span style="margin-left:auto;width:5px;height:5px;border-radius:50%;background:#00FF88;box-shadow:0 0 6px #00FF88;animation:livePulse 1.5s ease-in-out infinite"></span>
+              <div style="padding:0 12px 12px">
+                <div style="background:#00030a;border:1px solid rgba(0,245,255,.1);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;justify-content:flex-end"><div style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:8px 11px;border-radius:11px 11px 3px 11px;max-width:78%;font-size:11px;line-height:1.5;font-weight:600">Estoy muy cansado y tengo reunión en 1h.</div></div>
+                  <div style="display:flex;gap:7px;align-items:flex-start">
+                    <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">🤖</div>
+                    <div style="background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.1);border-radius:3px 11px 11px 11px;padding:9px 11px;font-size:11px;line-height:1.6;color:#94A3B8">
+                      <strong style="color:#00FF88">FATIGA MEDIA.</strong> 58 min antes.<br>⚡ <strong style="color:#F0F4FF">AHORA:</strong> 10 min sin pantalla.<br>🎯 <strong style="color:#F0F4FF">REUNIÓN:</strong> Llegas al 78%.
+                    </div>
                   </div>
-                  <div style="background:#000810;padding:12px;display:flex;flex-direction:column;gap:9px;min-height:200px">
-                    <div style="text-align:center;font-size:8px;color:#1e293b;font-family:'Orbitron',sans-serif;letter-spacing:1px">HOY · 15:42:07</div>
-                    <div style="display:flex;justify-content:flex-end"><div style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:8px 12px;border-radius:12px 12px 3px 12px;max-width:78%;font-size:11px;line-height:1.5;font-weight:600">Estoy muy cansado y tengo reunión en 1h. ¿Qué hago?</div></div>
-                    <div style="display:flex;gap:6px;align-items:flex-start">
-                      <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">🤖</div>
-                      <div style="background:rgba(0,245,255,.05);border:1px solid rgba(0,245,255,.12);border-radius:3px 12px 12px 12px;padding:9px 11px;max-width:82%;font-size:11px;line-height:1.6;color:#94A3B8">
-                        <strong style="color:#00FF88">FATIGA MEDIA DETECTADA.</strong> 58 min antes de la reunión.<br><br>
-                        ⚡ <strong style="color:#F0F4FF">AHORA:</strong> Cierra el PC, 10 min ventana.<br>
-                        🔋 <strong style="color:#F0F4FF">+15 MIN:</strong> Come algo ligero.<br>
-                        🎯 <strong style="color:#F0F4FF">REUNIÓN:</strong> Capacidad al 78%.
-                      </div>
-                    </div>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap">
-                      <div style="padding:4px 10px;border-radius:6px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00FF88;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">✓ DESCANSO 10 MIN</div>
-                      <div style="padding:4px 10px;border-radius:6px;background:rgba(0,245,255,.08);border:1px solid rgba(0,245,255,.2);color:#00F5FF;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">📅 VER AGENDA</div>
-                    </div>
+                  <div style="display:flex;gap:6px">
+                    <div style="padding:4px 9px;border-radius:5px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00FF88;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">✓ DESCANSO</div>
+                    <div style="padding:4px 9px;border-radius:5px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.18);color:#00F5FF;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">📅 AGENDA</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Demo 2 -->
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:13px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d2')">
-              <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,0,110,.2),rgba(245,158,11,.1));border:1px solid rgba(255,0,110,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📷</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;margin-bottom:1px">BIO-SCANNER</div><div style="font-size:11px;color:#475569">Escaneo facial cuántico</div></div>
-              <span id="d2-arrow" style="color:#FF006E;font-size:12px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
+          <div class="card" style="overflow:hidden">
+            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d2')">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,0,110,.1);border:1px solid rgba(255,0,110,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📷</div>
+              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">BIO-SCANNER</div><div style="font-size:10px;color:#475569;margin-top:1px">Escaneo facial cuántico</div></div>
+              <span id="d2-arrow" style="color:#FF006E;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
             </div>
             <div id="d2" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 13px 13px">
-                <div style="background:#000810;border:1px solid rgba(255,0,110,.15);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px">
-                  <div style="position:relative;width:120px;height:120px">
-                    <div style="position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(0,255,136,.3);animation:pulse 2s ease-in-out infinite"></div>
-                    <div style="position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(0,255,136,.4);animation:pulse 2s ease-in-out .4s infinite"></div>
-                    <div style="position:absolute;inset:0;border-radius:50%;background:linear-gradient(145deg,#0a1a10,#0f172a);border:2px solid #00FF88;overflow:hidden">
-                      <svg width="100%" height="100%" viewBox="0 0 120 120"><circle cx="60" cy="55" r="34" fill="#1a0a0a" opacity=".8"/><ellipse cx="49" cy="49" rx="6.5" ry="7.5" fill="#0a0020"/><ellipse cx="71" cy="49" rx="6.5" ry="7.5" fill="#0a0020"/><circle cx="49" cy="49" r="4" fill="#00F5FF" opacity=".6"/><circle cx="71" cy="49" r="4" fill="#00F5FF" opacity=".6"/><circle cx="50.5" cy="47.5" r="1.5" fill="#fff"/><circle cx="72.5" cy="47.5" r="1.5" fill="#fff"/><path d="M56 61 Q60 67 64 61" fill="none" stroke="rgba(0,245,255,.4)" stroke-width="1.5" stroke-linecap="round"/><path d="M50 72 Q60 79 70 72" fill="none" stroke="rgba(0,245,255,.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
-                      <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00FF88,transparent);animation:scan 2.5s ease-in-out infinite"></div>
+              <div style="padding:0 12px 12px">
+                <div style="background:#00030a;border:1px solid rgba(255,0,110,.1);border-radius:10px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px">
+                  <div style="position:relative;width:110px;height:110px">
+                    <div style="position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(0,255,136,.25);animation:pulse 2s ease-in-out infinite"></div>
+                    <div style="position:absolute;inset:0;border-radius:50%;background:#000a10;border:2px solid #00FF88;overflow:hidden">
+                      <svg width="100%" height="100%" viewBox="0 0 110 110"><circle cx="55" cy="50" r="30" fill="#100808" opacity=".8"/><ellipse cx="44" cy="44" rx="6" ry="7" fill="#00030f"/><ellipse cx="66" cy="44" rx="6" ry="7" fill="#00030f"/><circle cx="44" cy="44" r="3.5" fill="#00F5FF" opacity=".5"/><circle cx="66" cy="44" r="3.5" fill="#00F5FF" opacity=".5"/><circle cx="45.5" cy="42.5" r="1.3" fill="#fff"/><circle cx="67.5" cy="42.5" r="1.3" fill="#fff"/><path d="M50 57 Q55 63 60 57" fill="none" stroke="rgba(0,245,255,.3)" stroke-width="1.5" stroke-linecap="round"/><path d="M45 68 Q55 74 65 68" fill="none" stroke="rgba(0,245,255,.25)" stroke-width="1.5" stroke-linecap="round"/></svg>
+                      <div style="position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,#00FF88,transparent);animation:scan 2.5s ease-in-out infinite"></div>
                     </div>
-                    <div style="position:absolute;top:3px;left:3px;width:12px;height:12px;border-top:2px solid #00FF88;border-left:2px solid #00FF88"></div>
-                    <div style="position:absolute;top:3px;right:3px;width:12px;height:12px;border-top:2px solid #00FF88;border-right:2px solid #00FF88"></div>
-                    <div style="position:absolute;bottom:3px;left:3px;width:12px;height:12px;border-bottom:2px solid #00FF88;border-left:2px solid #00FF88"></div>
-                    <div style="position:absolute;bottom:3px;right:3px;width:12px;height:12px;border-bottom:2px solid #00FF88;border-right:2px solid #00FF88"></div>
+                    <div style="position:absolute;top:2px;left:2px;width:11px;height:11px;border-top:2px solid #00FF88;border-left:2px solid #00FF88"></div>
+                    <div style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-top:2px solid #00FF88;border-right:2px solid #00FF88"></div>
+                    <div style="position:absolute;bottom:2px;left:2px;width:11px;height:11px;border-bottom:2px solid #00FF88;border-left:2px solid #00FF88"></div>
+                    <div style="position:absolute;bottom:2px;right:2px;width:11px;height:11px;border-bottom:2px solid #00FF88;border-right:2px solid #00FF88"></div>
                   </div>
-                  <div style="font-size:10px;color:#00FF88;font-weight:700;display:flex;align-items:center;gap:5px;font-family:'Orbitron',sans-serif;letter-spacing:1px"><span style="width:5px;height:5px;border-radius:50%;background:#00FF88;box-shadow:0 0 6px #00FF88;animation:livePulse 1s ease-in-out infinite"></span>LEYENDO SEÑALES...</div>
-                  <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px">
-                    <div class="card" style="padding:9px 11px"><div style="font-size:8px;color:#334155;margin-bottom:3px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">ESTRÉS</div><div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#F59E0B">4<span style="font-size:9px;color:#334155">/10</span></div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:8px;color:#334155;margin-bottom:3px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">ENERGÍA</div><div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#00FF88">7<span style="font-size:9px;color:#334155">/10</span></div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:8px;color:#334155;margin-bottom:3px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">ESTADO</div><div style="font-size:11px;font-weight:700;color:#00F5FF;margin-top:1px;font-family:'Orbitron',sans-serif">FOCUS</div></div>
-                    <div class="card" style="padding:9px 11px"><div style="font-size:8px;color:#334155;margin-bottom:3px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">PRECISIÓN</div><div style="font-size:11px;font-weight:700;color:#7C3AED;margin-top:1px;font-family:'Orbitron',sans-serif">94%</div></div>
+                  <div style="font-size:9px;color:#00FF88;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:1px;display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#00FF88;animation:pulse 1s ease-in-out infinite"></span>LEYENDO SEÑALES...</div>
+                  <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ESTRÉS</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#F59E0B">4<span style="font-size:9px;color:#1e293b">/10</span></div></div>
+                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ENERGÍA</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#00FF88">7<span style="font-size:9px;color:#1e293b">/10</span></div></div>
+                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ESTADO</div><div style="font-size:11px;font-weight:700;color:#00F5FF;font-family:'Orbitron',sans-serif">FOCUS</div></div>
+                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">PRECISIÓN</div><div style="font-size:11px;font-weight:700;color:#7C3AED;font-family:'Orbitron',sans-serif">94%</div></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Demo 3 -->
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:13px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d3')">
-              <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(0,245,255,.1));border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔮</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;margin-bottom:1px">PREDICCIÓN CUÁNTICA</div><div style="font-size:11px;color:#475569">Gráfico de energía hora a hora</div></div>
-              <span id="d3-arrow" style="color:#7C3AED;font-size:12px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
+          <div class="card" style="overflow:hidden">
+            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d3')">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌅</div>
+              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">DREAM ARCHITECT</div><div style="font-size:10px;color:#475569;margin-top:1px">Briefing matutino de IA</div></div>
+              <span id="d3-arrow" style="color:#00FF88;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
             </div>
             <div id="d3" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 13px 13px">
-                <div style="background:#000810;border:1px solid rgba(124,58,237,.15);border-radius:12px;padding:14px">
-                  <div style="background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.2);border-radius:8px;padding:8px 11px;margin-bottom:10px;display:flex;gap:7px;font-size:10px;color:#94A3B8;line-height:1.5;font-family:'Orbitron',sans-serif"><span>⚠</span><div><strong style="color:#FF006E">ALERTA 16:30H:</strong> CAÍDA DE ENERGÍA EN ~40 MIN</div></div>
-                  <svg width="100%" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
-                    <defs><linearGradient id="pcg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".3"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
-                    <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(0,245,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="40" x2="300" y2="40" stroke="rgba(0,245,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(0,245,255,.05)" stroke-width="1"/>
-                    <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(0,245,255,.05)" stroke-width="1"/>
-                    <path d="M14,24 L58,30 L100,18 L142,32 L184,27 L184,88 L14,88 Z" fill="url(#pcg2)"/>
-                    <path d="M14,24 L58,30 L100,18 L142,32 L184,27" fill="none" stroke="#00F5FF" stroke-width="2" style="animation:lineGrow 1.5s ease forwards;stroke-dasharray:300;stroke-dashoffset:300"/>
-                    <path d="M184,27 L232,58 L280,76" fill="none" stroke="#FF006E" stroke-width="1.5" stroke-dasharray="5 4" opacity=".8"/>
-                    <line x1="184" y1="12" x2="184" y2="88" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <rect x="170" y="5" width="28" height="11" rx="2" fill="#F59E0B"/>
-                    <text x="184" y="13" font-size="6" fill="#000" text-anchor="middle" font-weight="900" font-family="Orbitron">AHORA</text>
-                    <circle cx="184" cy="27" r="4" fill="#F59E0B" stroke="#000810" stroke-width="1.5"/>
-                    <text x="14" y="97" font-size="7" fill="#1e293b" text-anchor="middle" font-family="Orbitron">9H</text>
-                    <text x="58" y="97" font-size="7" fill="#1e293b" text-anchor="middle" font-family="Orbitron">11H</text>
-                    <text x="100" y="97" font-size="7" fill="#1e293b" text-anchor="middle" font-family="Orbitron">13H</text>
-                    <text x="142" y="97" font-size="7" fill="#1e293b" text-anchor="middle" font-family="Orbitron">15H</text>
-                    <text x="184" y="97" font-size="7" fill="#F59E0B" text-anchor="middle" font-weight="700" font-family="Orbitron">16H</text>
-                    <text x="232" y="97" font-size="7" fill="#FF006E" text-anchor="middle" font-family="Orbitron">17H</text>
-                    <text x="280" y="97" font-size="7" fill="#FF006E" text-anchor="middle" font-family="Orbitron">18H</text>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Demo 4 -->
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:13px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d4')">
-              <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(0,255,136,.12),rgba(0,245,255,.08));border:1px solid rgba(0,255,136,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏠</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;margin-bottom:1px">SMART ENVIRONMENT</div><div style="font-size:11px;color:#475569">Comandos Google Home y Alexa</div></div>
-              <span id="d4-arrow" style="color:#00FF88;font-size:12px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
-            </div>
-            <div id="d4" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 13px 13px;display:flex;flex-direction:column;gap:7px">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-                  <div class="card" style="padding:10px"><div style="font-size:16px;margin-bottom:4px">💡</div><div style="font-size:11px;font-weight:600;font-family:'Orbitron',sans-serif;font-size:9px;margin-bottom:1px">LUZ</div><div style="font-size:10px;color:#475569">Cálido 70%</div></div>
-                  <div class="card" style="padding:10px"><div style="font-size:16px;margin-bottom:4px">🎵</div><div style="font-family:'Orbitron',sans-serif;font-size:9px;margin-bottom:1px">MÚSICA</div><div style="font-size:10px;color:#475569">Lo-fi ≤80 BPM</div></div>
-                  <div class="card" style="padding:10px"><div style="font-size:16px;margin-bottom:4px">🌡️</div><div style="font-family:'Orbitron',sans-serif;font-size:9px;margin-bottom:1px">TEMP</div><div style="font-size:10px;color:#475569">20°C</div></div>
-                  <div class="card" style="padding:10px"><div style="font-size:16px;margin-bottom:4px">🔕</div><div style="font-family:'Orbitron',sans-serif;font-size:9px;margin-bottom:1px">SILENCIO</div><div style="font-size:10px;color:#475569">90 min</div></div>
-                </div>
-                <button onclick="copyEnvCmds(this)" style="padding:10px;border-radius:10px;background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,245,255,.1));border:1px solid rgba(0,255,136,.3);color:#00FF88;font-size:10px;font-weight:700;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:1px">COPIAR COMANDOS DE VOZ</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Demo 5 -->
-          <div class="card" style="padding:0;overflow:hidden">
-            <div style="padding:13px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d5')">
-              <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(99,179,237,.12),rgba(124,58,237,.08));border:1px solid rgba(99,179,237,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌅</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;margin-bottom:1px">DREAM ARCHITECT</div><div style="font-size:11px;color:#475569">Briefing matutino de IA</div></div>
-              <span id="d5-arrow" style="color:#63B3ED;font-size:12px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
-            </div>
-            <div id="d5" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 13px 13px">
-                <div style="background:linear-gradient(160deg,#000810,#000a14);border-radius:12px;padding:14px;border:1px solid rgba(99,179,237,.15);display:flex;flex-direction:column;gap:9px">
-                  <div style="text-align:center"><div style="font-size:22px;margin-bottom:3px">🌅</div><div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:1px">BUENOS DÍAS, CARLOS</div><div style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif;letter-spacing:1px">07:15:00 AM</div></div>
-                  <div class="card" style="padding:10px;background:rgba(99,179,237,.06);border-color:rgba(99,179,237,.15)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif">🌙 SUEÑO</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:#63B3ED">86%</span></div><div style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">7.5H · 2 CICLOS REM · ÓPTIMO</div></div>
-                  <div style="display:flex;flex-direction:column;gap:5px">
-                    <div style="padding:7px 10px;background:rgba(0,255,136,.06);border-radius:8px;border-left:2px solid #00FF88;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#00FF88">09:00–11:30</strong> · <span style="color:#475569">VENTANA MÁXIMA DE FOCO</span></div>
-                    <div style="padding:7px 10px;background:rgba(255,0,110,.05);border-radius:8px;border-left:2px solid #FF006E;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#FF006E">15:00–16:30</strong> · <span style="color:#475569">BAJA DE ENERGÍA DETECTADA</span></div>
-                  </div>
+              <div style="padding:0 12px 12px">
+                <div style="background:#00030a;border:1px solid rgba(0,255,136,.1);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:9px">
+                  <div style="text-align:center"><div style="font-size:20px;margin-bottom:4px">🌅</div><div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:1px">BUENOS DÍAS, CARLOS</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif;letter-spacing:1px">07:15 AM</div></div>
+                  <div class="card" style="padding:9px 11px;background:rgba(99,179,237,.05);border-color:rgba(99,179,237,.12)"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif">🌙 SUEÑO</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:#63B3ED">86%</span></div><div style="font-size:10px;color:#1e293b;font-family:'Orbitron',sans-serif">7.5H · 2 REM · ÓPTIMO</div></div>
+                  <div style="padding:7px 10px;background:rgba(0,255,136,.05);border-radius:8px;border-left:2px solid #00FF88;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#00FF88">09:00–11:30</strong> · <span style="color:#475569">VENTANA MÁXIMA FOCO</span></div>
+                  <div style="padding:7px 10px;background:rgba(255,0,110,.04);border-radius:8px;border-left:2px solid #FF006E;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#FF006E">15:00–16:30</strong> · <span style="color:#475569">BAJA DE ENERGÍA</span></div>
                 </div>
               </div>
             </div>
@@ -505,171 +326,150 @@ html,body{height:100%;background:#000008;color:#F0F4FF;font-family:'Exo 2',sans-
       </div>
     </div>
 
-    <!-- ═══ PLANES ═══ -->
+    <!-- PLANES -->
     <div class="page" id="page-planes">
       <div class="page-inner">
-        <div style="margin-bottom:18px">
-          <div class="sec-tag" style="background:rgba(0,255,136,.08);color:#00FF88;border:1px solid rgba(0,255,136,.2)">SELECCIONAR MÓDULO</div>
-          <div class="ttl">3 PLANES,<br><span class="text-cyan">UN UNIVERSO</span></div>
-          <div class="sub">Todos incluyen <strong style="color:#00FF88">3 días gratis</strong>. Sin tarjeta.</div>
+        <div style="margin-bottom:16px">
+          <div class="tag" style="background:rgba(0,255,136,.07);color:#00FF88;border:1px solid rgba(0,255,136,.18)">SELECCIONAR PLAN</div>
+          <div class="ttl">3 PLANES,<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">UN UNIVERSO</span></div>
+          <div style="font-size:12px;color:#475569;margin-bottom:0">Todos incluyen <strong style="color:#00FF88">3 días gratis</strong>. Sin tarjeta.</div>
         </div>
 
-        <!-- Plan Creativa -->
-        <div style="border-radius:16px;padding:18px;margin-bottom:12px;background:linear-gradient(145deg,#0a0218,#050010);border:1.5px solid rgba(255,0,110,.3);position:relative;overflow:hidden;transition:transform .3s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-          <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(255,0,110,.12);border-radius:50%;filter:blur(40px)"></div>
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#FF006E,transparent)"></div>
-          <div style="position:absolute;top:12px;right:12px;font-size:8px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(255,0,110,.15);border:1px solid rgba(255,0,110,.35);color:#FF006E;font-family:'Orbitron',sans-serif;letter-spacing:1px">POPULAR</div>
-          <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#FF006E);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;box-shadow:0 0 20px rgba(255,0,110,.3)">🎨</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:2px;letter-spacing:1px">CREATIVA</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:10px">Tu estudio creativo inteligente</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#FF006E;font-weight:700">›</span>Gestión de proyectos con IA</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#FF006E;font-weight:700">›</span>Captura ilimitada de ideas</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#FF006E;font-weight:700">›</span>Seguimiento de ingresos</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#FF006E;font-weight:700">›</span>Pitch para conseguir clientes</div>
+        <!-- CREATIVA -->
+        <div style="border-radius:14px;padding:16px;margin-bottom:10px;background:linear-gradient(145deg,#080012,#04000a);border:1.5px solid rgba(255,0,110,.25);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#FF006E88,transparent)"></div>
+          <div style="position:absolute;top:10px;right:10px;font-size:8px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(255,0,110,.12);border:1px solid rgba(255,0,110,.3);color:#FF006E;font-family:'Orbitron',sans-serif;letter-spacing:.8px">POPULAR</div>
+          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#FF006E);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(255,0,110,.2)">🎨</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">CREATIVA</div>
+          <div style="font-size:11px;color:#475569;margin-bottom:9px">Tu estudio creativo inteligente</div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Gestión de proyectos con IA</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Captura ilimitada de ideas</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Seguimiento de ingresos</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Coach creativo diario</div>
           </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:12px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;background:linear-gradient(90deg,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$89</span>
-            <span style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
+            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$89</span>
+            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
           </div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="btn-primary" style="background:linear-gradient(135deg,#7C3AED,#FF006E);box-shadow:0 0 20px rgba(124,58,237,.3)">ACTIVAR ACCESO →</a>
+          <!-- PAGO PAYPAL -->
+          <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#7C3AED,#FF006E);margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
+          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
         </div>
 
-        <!-- Plan Bienestar -->
-        <div style="border-radius:16px;padding:18px;margin-bottom:12px;background:linear-gradient(145deg,#001a0e,#000f08);border:1.5px solid rgba(0,255,136,.25);position:relative;overflow:hidden;transition:transform .3s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-          <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(0,255,136,.08);border-radius:50%;filter:blur(40px)"></div>
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00FF88,transparent)"></div>
-          <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#00FF88,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;box-shadow:0 0 20px rgba(0,255,136,.25)">🌿</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:2px;letter-spacing:1px">BIENESTAR</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:10px">Vive en armonía, sin estrés</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#00FF88;font-weight:700">›</span>Monitor sueño, estrés y energía</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#00FF88;font-weight:700">›</span>Meditaciones y guías diarias</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#00FF88;font-weight:700">›</span>Plan de alimentación consciente</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#00FF88;font-weight:700">›</span>Programa personalizado 30 días</div>
+        <!-- BIENESTAR -->
+        <div style="border-radius:14px;padding:16px;margin-bottom:10px;background:linear-gradient(145deg,#001408,#000d05);border:1.5px solid rgba(0,255,136,.2);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00FF8888,transparent)"></div>
+          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#00FF88,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(0,255,136,.15)">🌿</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">BIENESTAR</div>
+          <div style="font-size:11px;color:#475569;margin-bottom:9px">Vive en armonía, sin estrés</div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Monitor sueño, estrés y energía</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Meditaciones y guías diarias</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Plan de alimentación consciente</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Programa personalizado 30 días</div>
           </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:12px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$79</span>
-            <span style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
+            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$79</span>
+            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
           </div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="btn-cyan">ACTIVAR ACCESO →</a>
+          <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="btn-c" style="margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
+          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
         </div>
 
-        <!-- Plan Smart -->
-        <div style="border-radius:16px;padding:18px;background:linear-gradient(145deg,#0f0a00,#0a0700);border:1.5px solid rgba(245,158,11,.25);position:relative;overflow:hidden;transition:transform .3s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-          <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(245,158,11,.08);border-radius:50%;filter:blur(40px)"></div>
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#F59E0B,transparent)"></div>
-          <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;box-shadow:0 0 20px rgba(245,158,11,.25)">⚡</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:2px;letter-spacing:1px">INTELIGENTE</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:10px">Cada peso, en su lugar</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B;font-weight:700">›</span>Control de gastos en tiempo real</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B;font-weight:700">›</span>Alertas de pagos y ofertas</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B;font-weight:700">›</span>Plan de compras optimizado</div>
-            <div style="display:flex;gap:7px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B;font-weight:700">›</span>Plan financiero 30 días</div>
+        <!-- INTELIGENTE -->
+        <div style="border-radius:14px;padding:16px;background:linear-gradient(145deg,#0c0800,#070500);border:1.5px solid rgba(245,158,11,.2);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#F59E0B88,transparent)"></div>
+          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(245,158,11,.15)">⚡</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">INTELIGENTE</div>
+          <div style="font-size:11px;color:#475569;margin-bottom:9px">Cada peso, en su lugar</div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Control de gastos en tiempo real</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Alertas de pagos y ofertas</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Plan de compras optimizado</div>
+            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Plan financiero 30 días</div>
           </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:12px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;background:linear-gradient(90deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$49</span>
-            <span style="font-size:10px;color:#334155;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
+          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
+            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$49</span>
+            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
           </div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="btn-primary" style="background:linear-gradient(135deg,#F59E0B,#EF4444);box-shadow:0 0 20px rgba(245,158,11,.25)">ACTIVAR ACCESO →</a>
+          <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#F59E0B,#EF4444);box-shadow:0 4px 14px rgba(245,158,11,.2);margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
+          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
         </div>
-        <div style="text-align:center;margin-top:12px;font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif;letter-spacing:1px">💙 PAYPAL · 🔵 MERCADO PAGO · CANCELA CUANDO QUIERAS</div>
+        <div style="text-align:center;margin-top:11px;font-size:9px;color:#0f172a;font-family:'Orbitron',sans-serif;letter-spacing:.8px">PAGO SEGURO · CANCELA CUANDO QUIERAS</div>
       </div>
     </div>
 
-    <!-- ═══ REFERIDOS ═══ -->
+    <!-- REFERIDOS -->
     <div class="page" id="page-referidos">
       <div class="page-inner">
-        <div style="text-align:center;margin-bottom:20px">
-          <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px;animation:glow-anim 3s ease-in-out infinite">🎁</div>
-          <div class="sec-tag" style="background:rgba(0,255,136,.08);color:#00FF88;border:1px solid rgba(0,255,136,.2)">PROGRAMA QUANTUM</div>
-          <div class="ttl">INVITA · GANA ·<br><span class="text-cyan">COMPARTE</span></div>
-          <div class="sub">Invita un amigo y <strong style="color:#00FF88">ambos ganan 1 mes gratis</strong>. Sin límite.</div>
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 11px;animation:glow 3s ease-in-out infinite">🎁</div>
+          <div class="tag" style="background:rgba(0,255,136,.07);color:#00FF88;border:1px solid rgba(0,255,136,.18)">PROGRAMA QUANTUM</div>
+          <div class="ttl">INVITA · GANA ·<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">COMPARTE</span></div>
+          <div style="font-size:12px;color:#475569;line-height:1.6">Invita un amigo y <strong style="color:#00FF88">ambos ganan 1 mes gratis</strong>.</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-          <div class="card" style="padding:14px;text-align:center;border-color:rgba(124,58,237,.2)"><div style="font-size:20px;margin-bottom:5px">🙋</div><div style="font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;color:#7C3AED;margin-bottom:1px;letter-spacing:.5px">TÚ GANAS</div><div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900">1 MES</div><div style="font-size:10px;color:#334155;margin-top:2px">gratis por amigo</div></div>
-          <div class="card" style="padding:14px;text-align:center;border-color:rgba(0,255,136,.2)"><div style="font-size:20px;margin-bottom:5px">🤝</div><div style="font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;color:#00FF88;margin-bottom:1px;letter-spacing:.5px">TU AMIGO</div><div style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900">1 MES</div><div style="font-size:10px;color:#334155;margin-top:2px">al suscribirse</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+          <div class="card" style="padding:13px;text-align:center;border-color:rgba(124,58,237,.18)"><div style="font-size:18px;margin-bottom:4px">🙋</div><div style="font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;color:#7C3AED;margin-bottom:1px;letter-spacing:.5px">TÚ GANAS</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900">1 MES</div><div style="font-size:9px;color:#1e293b;margin-top:1px">gratis por amigo</div></div>
+          <div class="card" style="padding:13px;text-align:center;border-color:rgba(0,255,136,.18)"><div style="font-size:18px;margin-bottom:4px">🤝</div><div style="font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;color:#00FF88;margin-bottom:1px;letter-spacing:.5px">TU AMIGO</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900">1 MES</div><div style="font-size:9px;color:#1e293b;margin-top:1px">al suscribirse</div></div>
         </div>
-        <div class="card" style="padding:13px;margin-bottom:11px">
-          <div style="font-size:9px;color:#334155;margin-bottom:7px;font-family:'Orbitron',sans-serif;letter-spacing:1px;font-weight:600">TU LINK DE REFERIDO</div>
-          <div style="display:flex;gap:7px;align-items:center">
-            <div style="flex:1;font-family:monospace;font-size:10px;color:#00F5FF;background:rgba(0,245,255,.05);padding:8px 10px;border-radius:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(0,245,255,.15)">syncroquantume.netlify.app/ref/TU-CODIGO</div>
-            <button id="refCopyBtn" onclick="copyRef()" style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;border:none;border-radius:8px;padding:8px 12px;font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap;font-family:'Orbitron',sans-serif;letter-spacing:.5px">COPIAR</button>
+        <div class="card" style="padding:12px;margin-bottom:10px">
+          <div style="font-size:8px;color:#1e293b;margin-bottom:6px;font-family:'Orbitron',sans-serif;letter-spacing:1px;font-weight:700">TU LINK DE REFERIDO</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div style="flex:1;font-family:monospace;font-size:10px;color:#00F5FF;background:rgba(0,245,255,.04);padding:7px 9px;border-radius:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(0,245,255,.12)">syncroquantume.netlify.app/ref/TU-CODIGO</div>
+            <button id="refCopyBtn" onclick="copyRef()" style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;border:none;border-radius:7px;padding:7px 11px;font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap;font-family:'Orbitron',sans-serif;letter-spacing:.3px">COPIAR</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-          <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:10px;background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);color:#25D366;font-weight:700;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.5px">💬 WHATSAPP</button>
-          <button onclick="shareOther(this)" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:10px;background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.25);color:#FF006E;font-weight:700;font-size:11px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.5px">📸 COMPARTIR</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:9px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);color:#25D366;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.3px">💬 WHATSAPP</button>
+          <button onclick="shareOther(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:9px;background:rgba(255,0,110,.07);border:1px solid rgba(255,0,110,.2);color:#FF006E;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.3px">📸 COMPARTIR</button>
         </div>
       </div>
     </div>
 
-    <!-- ═══ PERFIL ═══ -->
+    <!-- PERFIL -->
     <div class="page" id="page-perfil">
       <div class="page-inner">
-        <div style="text-align:center;padding:14px 0 20px">
-          <div style="position:relative;display:inline-block;margin-bottom:12px">
-            <div id="profile-avatar" style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:30px;animation:glow-anim 3s ease-in-out infinite;position:relative;overflow:hidden">
-              😊
-              <div style="position:absolute;inset:0;background:linear-gradient(45deg,transparent,rgba(255,255,255,.1),transparent);animation:shine 3s ease-in-out infinite"></div>
-            </div>
-            <div style="position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:6px;background:#00FF88;border:2px solid #000008;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
+        <div style="text-align:center;padding:12px 0 18px">
+          <div style="position:relative;display:inline-block;margin-bottom:11px">
+            <div id="profile-avatar" style="width:68px;height:68px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:28px;animation:glow 3s ease-in-out infinite">😊</div>
+            <div style="position:absolute;bottom:-3px;right:-3px;width:18px;height:18px;border-radius:5px;background:#00FF88;border:2px solid #000008;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
           </div>
-          <div id="profile-name" style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;margin-bottom:3px;letter-spacing:1px">MI PERFIL</div>
-          <div id="profile-email-display" style="font-size:11px;color:#334155;margin-bottom:8px;font-family:'Orbitron',sans-serif;letter-spacing:.5px"></div>
-          <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:6px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);font-size:10px;font-weight:700;color:#00FF88;font-family:'Orbitron',sans-serif;letter-spacing:1px">
-            <span style="width:6px;height:6px;border-radius:50%;background:#00FF88;box-shadow:0 0 8px #00FF88;animation:livePulse 1.5s infinite"></span>SISTEMA ACTIVO
-          </div>
+          <div id="profile-name" style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:2px;letter-spacing:1px">MI PERFIL</div>
+          <div id="profile-email-display" style="font-size:10px;color:#1e293b;margin-bottom:7px;font-family:'Orbitron',sans-serif;letter-spacing:.3px"></div>
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:5px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.18);font-size:9px;font-weight:700;color:#00FF88;font-family:'Orbitron',sans-serif;letter-spacing:1px"><span style="width:5px;height:5px;border-radius:50%;background:#00FF88;animation:pulse 1.5s infinite"></span>SISTEMA ACTIVO</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#7C3AED">14</div><div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">DÍAS</div></div>
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#00FF88">94%</div><div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">PRECISIÓN</div></div>
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;color:#F59E0B">7</div><div style="font-size:9px;color:#334155;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">PATRONES</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:16px">
+          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#7C3AED">14</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">DÍAS</div></div>
+          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#00FF88">94%</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">PRECISIÓN</div></div>
+          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#F59E0B">7</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">PATRONES</div></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('planes')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;font-size:15px">💎</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px">MI PLAN</div><div style="font-size:10px;color:#475569">Plan Creativa · $89/mes</div></div><span style="color:#00F5FF;font-size:13px">›</span></div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('referidos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;font-size:15px">🎁</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px">INVITAR AMIGOS</div><div style="font-size:10px;color:#475569">Gana 1 mes gratis por cada uno</div></div><span style="color:#00FF88;font-size:13px">›</span></div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="installApp()"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,245,255,.08);border:1px solid rgba(0,245,255,.15);display:flex;align-items:center;justify-content:center;font-size:15px">📲</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px">INSTALAR APP</div><div style="font-size:10px;color:#475569">Añadir a pantalla de inicio</div></div><span style="color:#00F5FF;font-size:13px">›</span></div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="openModal('privacy')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(99,179,237,.08);border:1px solid rgba(99,179,237,.15);display:flex;align-items:center;justify-content:center;font-size:15px">🔐</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px">SEGURIDAD</div><div style="font-size:10px;color:#475569">Cifrado total · Sin venta de datos</div></div><span style="color:#63B3ED;font-size:13px">›</span></div>
-          <div class="card" style="padding:12px 14px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="doLogout()"><div style="width:34px;height:34px;border-radius:9px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);display:flex;align-items:center;justify-content:center;font-size:15px">🚪</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#EF4444;font-family:'Orbitron',sans-serif;letter-spacing:.5px">CERRAR SESIÓN</div><div style="font-size:10px;color:#475569">Salir del sistema</div></div><span style="color:#EF4444;font-size:13px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('planes')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;font-size:14px">💎</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">MI PLAN</div><div style="font-size:10px;color:#475569">Plan Creativa · $89/mes</div></div><span style="color:#00F5FF;font-size:12px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('referidos')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🎁</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">INVITAR AMIGOS</div><div style="font-size:10px;color:#475569">1 mes gratis por cada uno</div></div><span style="color:#00FF88;font-size:12px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="installApp()"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.14);display:flex;align-items:center;justify-content:center;font-size:14px">📲</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">INSTALAR APP</div><div style="font-size:10px;color:#475569">Añadir a pantalla de inicio</div></div><span style="color:#00F5FF;font-size:12px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="openModal('privacy')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(99,179,237,.07);border:1px solid rgba(99,179,237,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🔐</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">SEGURIDAD</div><div style="font-size:10px;color:#475569">Cifrado total · Sin venta</div></div><span style="color:#63B3ED;font-size:12px">›</span></div>
+          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="doLogout()"><div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🚪</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#EF4444;font-family:'Orbitron',sans-serif;letter-spacing:.3px">CERRAR SESIÓN</div><div style="font-size:10px;color:#475569">Salir del sistema</div></div><span style="color:#EF4444;font-size:12px">›</span></div>
         </div>
       </div>
     </div>
 
   </div><!-- pages -->
 
-  <!-- TAB BAR -->
+  <!-- TABBAR -->
   <div id="tabbar">
-    <button class="tab active" onclick="goTab('home')" id="tab-home">
-      <span class="tab-icon">🏠</span><span class="tab-label" style="color:#00F5FF">INICIO</span>
-      <div class="tab-glow" style="background:#00F5FF;box-shadow:0 0 8px #00F5FF"></div>
-    </button>
-    <button class="tab" onclick="goTab('demos')" id="tab-demos">
-      <span class="tab-icon">🎬</span><span class="tab-label">DEMOS</span>
-      <div class="tab-glow" style="background:#FF006E"></div>
-    </button>
-    <button class="tab" onclick="goTab('planes')" id="tab-planes">
-      <span class="tab-icon">💎</span><span class="tab-label">PLANES</span>
-      <div class="tab-glow" style="background:#00FF88"></div>
-    </button>
-    <button class="tab" onclick="goTab('referidos')" id="tab-referidos">
-      <span class="tab-icon">🎁</span><span class="tab-label">INVITAR</span>
-      <div class="tab-glow" style="background:#F59E0B"></div>
-      <div class="tab-badge show" id="badge-referidos"></div>
-    </button>
-    <button class="tab" onclick="goTab('perfil')" id="tab-perfil">
-      <span class="tab-icon">👤</span><span class="tab-label">PERFIL</span>
-      <div class="tab-glow" style="background:#7C3AED"></div>
-    </button>
+    <button class="tab active" onclick="goTab('home')" id="tab-home"><span class="tab-icon">🏠</span><span class="tab-label" style="color:#00F5FF">INICIO</span><div class="tab-line" style="background:#00F5FF;box-shadow:0 0 6px #00F5FF;opacity:1"></div></button>
+    <button class="tab" onclick="goTab('demos')" id="tab-demos"><span class="tab-icon">🎬</span><span class="tab-label">DEMOS</span><div class="tab-line" style="background:#FF006E"></div></button>
+    <button class="tab" onclick="goTab('planes')" id="tab-planes"><span class="tab-icon">💎</span><span class="tab-label">PLANES</span><div class="tab-line" style="background:#00FF88"></div></button>
+    <button class="tab" onclick="goTab('referidos')" id="tab-referidos"><span class="tab-icon">🎁</span><span class="tab-label">INVITAR</span><div class="tab-line" style="background:#F59E0B"></div><div class="tab-badge show" id="badge-referidos"></div></button>
+    <button class="tab" onclick="goTab('perfil')" id="tab-perfil"><span class="tab-icon">👤</span><span class="tab-label">PERFIL</span><div class="tab-line" style="background:#7C3AED"></div></button>
   </div>
-
 </div><!-- app -->
 
 <!-- UPDATE BANNER -->
 <div id="update-banner">
-  <span>✨ NUEVA VERSIÓN DISPONIBLE</span>
-  <button class="update-btn" onclick="applyUpdate()">ACTUALIZAR</button>
+  <span>✨ NUEVA VERSIÓN</span>
+  <button class="upd-btn" onclick="applyUpdate()">ACTUALIZAR</button>
 </div>
 
 <!-- TOAST -->
@@ -677,375 +477,151 @@ html,body{height:100%;background:#000008;color:#F0F4FF;font-family:'Exo 2',sans-
 
 <!-- MODAL -->
 <div id="modal-overlay" onclick="closeModal(event)">
-  <div id="modal" style="position:relative"><div id="modal-content"></div></div>
+  <div id="modal">
+    <div id="modal-content"></div>
+  </div>
 </div>
 
-<style>
-@keyframes orbitA{from{transform:rotate(0deg) translateX(46px) rotate(0deg)}to{transform:rotate(360deg) translateX(46px) rotate(-360deg)}}
-@keyframes orbitB{from{transform:rotate(0deg) translateX(46px) rotate(0deg)}to{transform:rotate(-360deg) translateX(46px) rotate(360deg)}}
-@keyframes orbitC{from{transform:rotate(90deg) translateX(46px) rotate(-90deg)}to{transform:rotate(450deg) translateX(46px) rotate(-450deg)}}
-@keyframes orbit1{from{transform:translateX(-50%) rotate(0deg) translateX(40px) rotate(0deg)}to{transform:translateX(-50%) rotate(360deg) translateX(40px) rotate(-360deg)}}
-@keyframes orbit2{from{transform:rotate(0deg) translateX(36px) rotate(0deg)}to{transform:rotate(-360deg) translateX(36px) rotate(360deg)}}
-</style>
-
 <script>
-// ═══════════════════════════════════════════════════
-// PARTICLES
-// ═══════════════════════════════════════════════════
-function initParticles(canvasId) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+// ── AUTH ──────────────────────────────────────────
+const ADMIN_EMAIL='dylanincrease@gmail.com', ADMIN_PASS='syncro2025';
+let currentUser=null, passVisible=false;
 
-  const particles = [];
-  const colors = ['#00F5FF', '#7C3AED', '#FF006E', '#00FF88', '#F59E0B'];
-
-  for (let i = 0; i < 80; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - .5) * .4,
-      vy: (Math.random() - .5) * .4,
-      r: Math.random() * 1.5 + .5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: Math.random() * .5 + .1,
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = canvas.width;
-      if (p.x > canvas.width) p.x = 0;
-      if (p.y < 0) p.y = canvas.height;
-      if (p.y > canvas.height) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.alpha;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = p.color;
-      ctx.fill();
-    });
-    // Connection lines
-    ctx.globalAlpha = 1;
-    ctx.shadowBlur = 0;
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 100) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = particles[i].color;
-          ctx.globalAlpha = (1 - dist / 100) * .15;
-          ctx.lineWidth = .5;
-          ctx.stroke();
-        }
-      }
-    }
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(draw);
-  }
-  draw();
+function togglePass(){
+  const i=document.getElementById('login-pass');
+  passVisible=!passVisible; i.type=passVisible?'text':'password';
+  document.getElementById('eye-btn').textContent=passVisible?'🙈':'👁';
 }
-
-initParticles('particles');
-
-// ═══════════════════════════════════════════════════
-// CURSOR
-// ═══════════════════════════════════════════════════
-const cursor = document.getElementById('cursor');
-const trail = document.getElementById('cursor-trail');
-let mx = 0, my = 0, tx = 0, ty = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx - 10 + 'px';
-  cursor.style.top = my - 10 + 'px';
-});
-setInterval(() => {
-  tx += (mx - tx) * .15;
-  ty += (my - ty) * .15;
-  trail.style.left = tx - 4 + 'px';
-  trail.style.top = ty - 4 + 'px';
-}, 16);
-
-// ═══════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════
-const ADMIN_EMAIL = 'dylanincrease@gmail.com';
-const ADMIN_PASS = 'syncro2025';
-let currentUser = null;
-let passVisible = false;
-
-function togglePass() {
-  const inp = document.getElementById('login-pass');
-  passVisible = !passVisible;
-  inp.type = passVisible ? 'text' : 'password';
-  document.getElementById('eye-btn').textContent = passVisible ? '🙈' : '👁';
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  const btn=document.getElementById('login-btn');
+  const err=document.getElementById('login-error');
+  err.style.display='none';
+  if(!email||!pass){showLoginError('COMPLETA TODOS LOS CAMPOS');return;}
+  btn.textContent='VERIFICANDO...';btn.style.opacity='.7';
+  setTimeout(()=>{
+    if(email===ADMIN_EMAIL.toLowerCase()&&pass===ADMIN_PASS){loginSuccess({email,name:'DYLAN',role:'admin'});}
+    else if(email!==ADMIN_EMAIL.toLowerCase()&&pass.length>=6){loginSuccess({email,name:email.split('@')[0].toUpperCase(),role:'user'});}
+    else{btn.textContent='⚡ INICIAR SESIÓN';btn.style.opacity='1';showLoginError('CREDENCIALES INCORRECTAS');}
+  },900);
 }
-
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass = document.getElementById('login-pass').value;
-  const btn = document.getElementById('login-btn');
-  const err = document.getElementById('login-error');
-  err.style.display = 'none';
-  if (!email || !pass) { showLoginError('COMPLETA TODOS LOS CAMPOS'); return; }
-  btn.textContent = 'VERIFICANDO...';
-  btn.style.opacity = '.7';
-  setTimeout(() => {
-    if (email === ADMIN_EMAIL.toLowerCase() && pass === ADMIN_PASS) {
-      loginSuccess({ email, name: 'DYLAN', role: 'admin' });
-    } else if (email !== ADMIN_EMAIL.toLowerCase() && pass.length >= 6) {
-      loginSuccess({ email, name: email.split('@')[0].toUpperCase(), role: 'user' });
-    } else {
-      btn.textContent = '⚡ INICIAR SESIÓN';
-      btn.style.opacity = '1';
-      showLoginError('CREDENCIALES INCORRECTAS');
-    }
-  }, 900);
+function showLoginError(msg){const el=document.getElementById('login-error');el.textContent='⚠ '+msg;el.style.display='block';}
+function loginSuccess(user){
+  currentUser=user;
+  try{localStorage.setItem('sq_user',JSON.stringify(user));}catch(e){}
+  document.getElementById('login-btn').textContent='ACCESO CONCEDIDO ✓';
+  setTimeout(()=>{hideLogin();showApp(user);},400);
 }
-
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
-}
-
-function loginSuccess(user) {
-  currentUser = user;
-  try { localStorage.setItem('sq_user', JSON.stringify(user)); } catch(e) {}
-  document.getElementById('login-btn').textContent = 'ACCESO CONCEDIDO ✓';
-  setTimeout(() => { hideLogin(); showApp(user); }, 500);
-}
-
-function showApp(user) {
-  const app = document.getElementById('app');
+function showApp(user){
+  const app=document.getElementById('app');
   app.classList.add('visible');
-  document.getElementById('user-chip').textContent = user.name.substring(0, 2);
-  document.getElementById('profile-name').textContent = user.name;
-  document.getElementById('profile-email-display').textContent = user.email;
-  if (user.role === 'admin') {
-    document.getElementById('home-greeting').innerHTML = `BIENVENIDO, ${user.name} 👋<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TU SISTEMA CUÁNTICO.</span>`;
-  }
-  initParticles('particles');
+  document.getElementById('user-chip').textContent=user.name.substring(0,2);
+  document.getElementById('profile-name').textContent=user.name;
+  document.getElementById('profile-email-display').textContent=user.email;
+  if(user.role==='admin'){document.getElementById('home-greeting').innerHTML=`BIENVENIDO, ${user.name} 👋<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TU SISTEMA CUÁNTICO.</span>`;}
   goTab('home');
 }
-
-function hideLogin() {
-  const ls = document.getElementById('login-screen');
-  ls.classList.add('hidden');
-  setTimeout(() => ls.style.display = 'none', 500);
-}
-
-function googleLogin() { showToast('GOOGLE AUTH PRÓXIMAMENTE'); }
-
-function doLogout() {
-  try { localStorage.removeItem('sq_user'); } catch(e) {}
-  currentUser = null;
+function hideLogin(){const ls=document.getElementById('login-screen');ls.classList.add('hidden');setTimeout(()=>ls.style.display='none',400);}
+function googleLogin(){showToast('GOOGLE AUTH PRÓXIMAMENTE');}
+function doLogout(){
+  try{localStorage.removeItem('sq_user');}catch(e){}
+  currentUser=null;
   document.getElementById('app').classList.remove('visible');
-  const ls = document.getElementById('login-screen');
-  ls.style.display = 'flex';
-  setTimeout(() => ls.classList.remove('hidden'), 50);
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-pass').value = '';
-  document.getElementById('login-error').style.display = 'none';
-  document.getElementById('login-btn').textContent = '⚡ INICIAR SESIÓN';
-  document.getElementById('login-btn').style.opacity = '1';
+  const ls=document.getElementById('login-screen');
+  ls.style.display='flex';setTimeout(()=>ls.classList.remove('hidden'),50);
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-error').style.display='none';
+  document.getElementById('login-btn').textContent='⚡ INICIAR SESIÓN';
+  document.getElementById('login-btn').style.opacity='1';
   showToast('SESIÓN TERMINADA');
 }
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
+// ── NAVIGATION ────────────────────────────────────
+let currentTab='home';
+const tabColors={home:'#00F5FF',demos:'#FF006E',planes:'#00FF88',referidos:'#F59E0B',perfil:'#7C3AED'};
+function goTab(tab){
+  if(tab===currentTab)return;
+  document.getElementById('page-'+currentTab).classList.remove('active');
+  const ct=document.getElementById('tab-'+currentTab);
+  if(ct){ct.classList.remove('active');ct.querySelector('.tab-label').style.color='';ct.querySelector('.tab-line').style.opacity='0';}
+  currentTab=tab;
+  const np=document.getElementById('page-'+tab);np.classList.add('active');np.scrollTop=0;
+  const nt=document.getElementById('tab-'+tab);
+  if(nt){nt.classList.add('active');nt.querySelector('.tab-label').style.color=tabColors[tab];nt.querySelector('.tab-line').style.opacity='1';nt.querySelector('.tab-icon').style.transform='scale(1.18)';setTimeout(()=>nt.querySelector('.tab-icon').style.transform='scale(1)',200);}
+  const badge=document.getElementById('badge-'+tab);if(badge)badge.classList.remove('show');
+}
+let tX=0,tY=0;
+const tabs=['home','demos','planes','referidos','perfil'];
+document.getElementById('pages').addEventListener('touchstart',e=>{tX=e.touches[0].clientX;tY=e.touches[0].clientY;},{passive:true});
+document.getElementById('pages').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tX,dy=e.changedTouches[0].clientY-tY;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){const i=tabs.indexOf(currentTab);if(dx<0&&i<tabs.length-1)goTab(tabs[i+1]);else if(dx>0&&i>0)goTab(tabs[i-1]);}
+},{passive:true});
 
-// ═══════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════
-let currentTab = 'home';
-const tabColors = { home:'#00F5FF', demos:'#FF006E', planes:'#00FF88', referidos:'#F59E0B', perfil:'#7C3AED' };
-
-function goTab(tab) {
-  if (tab === currentTab) return;
-  document.getElementById('page-' + currentTab).classList.remove('active');
-  const ct = document.getElementById('tab-' + currentTab);
-  if (ct) { ct.classList.remove('active'); ct.querySelector('.tab-label').style.color = ''; ct.querySelector('.tab-glow').style.opacity = '0'; }
-  currentTab = tab;
-  const np = document.getElementById('page-' + tab);
-  np.classList.add('active'); np.scrollTop = 0;
-  const nt = document.getElementById('tab-' + tab);
-  if (nt) {
-    nt.classList.add('active');
-    nt.querySelector('.tab-label').style.color = tabColors[tab];
-    nt.querySelector('.tab-glow').style.opacity = '1';
-    nt.querySelector('.tab-icon').style.transform = 'scale(1.2)';
-    setTimeout(() => nt.querySelector('.tab-icon').style.transform = 'scale(1)', 200);
-  }
-  const badge = document.getElementById('badge-' + tab);
-  if (badge) badge.classList.remove('show');
+// ── DEMOS ─────────────────────────────────────────
+function toggleDemo(id){
+  const el=document.getElementById(id),arrow=document.getElementById(id+'-arrow');
+  const isOpen=el.style.maxHeight&&el.style.maxHeight!=='0px';
+  ['d1','d2','d3'].forEach(d=>{document.getElementById(d).style.maxHeight='0px';const a=document.getElementById(d+'-arrow');if(a){a.style.transform='rotate(0deg)';a.style.color='';}});
+  if(!isOpen){el.style.maxHeight=el.scrollHeight+200+'px';arrow.style.transform='rotate(180deg)';arrow.style.color='#00F5FF';}
 }
 
-// Swipe
-let touchX = 0, touchY = 0;
-const tabs = ['home', 'demos', 'planes', 'referidos', 'perfil'];
-document.getElementById('pages').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; }, { passive: true });
-document.getElementById('pages').addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchX;
-  const dy = e.changedTouches[0].clientY - touchY;
-  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-    const i = tabs.indexOf(currentTab);
-    if (dx < 0 && i < tabs.length - 1) goTab(tabs[i + 1]);
-    else if (dx > 0 && i > 0) goTab(tabs[i - 1]);
-  }
-}, { passive: true });
+// ── UTILS ─────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function copyRef(){navigator.clipboard?.writeText('https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(()=>{});const btn=document.getElementById('refCopyBtn');btn.textContent='¡COPIADO ✓';btn.style.background='linear-gradient(135deg,#00FF88,#00F5FF)';showToast('🔗 LINK COPIADO ✓');setTimeout(()=>{btn.textContent='COPIAR';btn.style.background='linear-gradient(135deg,#7C3AED,#00F5FF)';},2500);}
+function shareWA(){window.open('https://wa.me/?text='+encodeURIComponent('🚀 Prueba SYNCRO QUANTUM gratis — el asistente de IA más avanzado. Usa mi link y los dos ganamos 1 mes gratis: https://syncroquantume.netlify.app/ref/TU-CODIGO'),'_blank');}
+function shareOther(btn){navigator.clipboard?.writeText('🚀 SYNCRO QUANTUM IA: https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(()=>{});showToast('📋 TEXTO COPIADO ✓');const o=btn.innerHTML;btn.innerHTML='¡COPIADO ✓';setTimeout(()=>{btn.innerHTML=o;},2500);}
+function copyEnvCmds(btn){navigator.clipboard?.writeText('"Ok Google, activa modo concentración"\n"Alexa, pon temperatura a 20 grados"').catch(()=>{});showToast('📋 COMANDOS COPIADOS ✓');const o=btn.textContent;btn.textContent='¡COPIADO ✓';setTimeout(()=>btn.textContent=o,2500);}
 
-// ═══════════════════════════════════════════════════
-// DEMOS
-// ═══════════════════════════════════════════════════
-function toggleDemo(id) {
-  const el = document.getElementById(id);
-  const arrow = document.getElementById(id + '-arrow');
-  const isOpen = el.style.maxHeight && el.style.maxHeight !== '0px';
-  ['d1','d2','d3','d4','d5'].forEach(d => {
-    document.getElementById(d).style.maxHeight = '0px';
-    const a = document.getElementById(d + '-arrow');
-    if (a) { a.style.transform = 'rotate(0deg)'; a.style.color = ''; }
-  });
-  if (!isOpen) {
-    el.style.maxHeight = el.scrollHeight + 300 + 'px';
-    arrow.style.transform = 'rotate(180deg)';
-    arrow.style.color = '#00F5FF';
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-function copyRef() {
-  navigator.clipboard?.writeText('https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(() => {});
-  const btn = document.getElementById('refCopyBtn');
-  btn.textContent = '¡COPIADO ✓'; btn.style.background = 'linear-gradient(135deg,#00FF88,#00F5FF)';
-  showToast('🔗 LINK COPIADO AL PORTAPAPELES');
-  setTimeout(() => { btn.textContent = 'COPIAR'; btn.style.background = 'linear-gradient(135deg,#7C3AED,#00F5FF)'; }, 2500);
-}
-function copyEnvCmds(btn) {
-  navigator.clipboard?.writeText('"Ok Google, activa modo concentración"\n"Alexa, pon temperatura a 20 grados"\n"Siri, activa No Molestar 90 minutos"').catch(() => {});
-  showToast('📋 COMANDOS COPIADOS ✓');
-  const o = btn.textContent; btn.textContent = '¡COPIADO ✓';
-  setTimeout(() => btn.textContent = o, 2500);
-}
-function shareWA() {
-  window.open('https://wa.me/?text=' + encodeURIComponent('🚀 Prueba SYNCRO QUANTUM gratis — el asistente de IA más avanzado del mundo. Usa mi link y los dos ganamos 1 mes gratis: https://syncroquantume.netlify.app/ref/TU-CODIGO'), '_blank');
-}
-function shareOther(btn) {
-  navigator.clipboard?.writeText('🚀 SYNCRO QUANTUM — IA adaptativa: https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(() => {});
-  showToast('📋 TEXTO COPIADO ✓');
-  const o = btn.innerHTML; btn.innerHTML = '¡COPIADO ✓';
-  setTimeout(() => btn.innerHTML = o, 2500);
-}
-
-// ═══════════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════════
-const modals = {
-  settings: `<div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:16px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⚙ CONFIGURACIÓN</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(0,245,255,.08)"><span style="font-size:12px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">NOTIFICACIONES</span><div style="width:40px;height:22px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:2px;background:#000;box-shadow:0 0 8px #00F5FF"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(0,245,255,.08)"><span style="font-size:12px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">BRIEFING 7:00 AM</span><div style="width:40px;height:22px;border-radius:4px;background:linear-gradient(135deg,#00FF88,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:2px;background:#000"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0"><span style="font-size:12px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">MODO OSCURO</span><div style="width:40px;height:22px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#FF006E);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:2px;background:#000"></div></div></div></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,245,255,.08);font-size:9px;color:#1e293b;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:1px">SYNCRO QUANTUM v1.0 · © 2025</div>`,
-  privacy: `<div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:14px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🔐 PROTOCOLO DE SEGURIDAD</div><div style="display:flex;flex-direction:column;gap:8px"><div style="padding:11px;background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.12);border-radius:10px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00F5FF">CIFRADO E2E:</strong> Solo tú accedes. Protocolo AES-256.</div><div style="padding:11px;background:rgba(0,255,136,.03);border:1px solid rgba(0,255,136,.12);border-radius:10px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00FF88">CERO VENTA:</strong> Tus datos nunca se comparten.</div><div style="padding:11px;background:rgba(124,58,237,.04);border:1px solid rgba(124,58,237,.12);border-radius:10px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#7C3AED">BORRADO TOTAL:</strong> Elimina todo con un comando.</div></div>`
+// ── MODAL ─────────────────────────────────────────
+const modals={
+  settings:`<div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:14px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⚙ CONFIGURACIÓN</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,245,255,.07)"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">NOTIFICACIONES</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000;box-shadow:0 0 6px #00F5FF"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,245,255,.07)"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">BRIEFING 7AM</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#00FF88,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">MODO OSCURO</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#FF006E);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000"></div></div></div></div><div style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(0,245,255,.07);font-size:9px;color:#0f172a;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:1px">SYNCRO QUANTUM v1.0 · © 2025</div>`,
+  privacy:`<div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:12px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🔐 SEGURIDAD</div><div style="display:flex;flex-direction:column;gap:7px"><div style="padding:10px;background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00F5FF">CIFRADO E2E:</strong> Solo tú accedes.</div><div style="padding:10px;background:rgba(0,255,136,.02);border:1px solid rgba(0,255,136,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00FF88">CERO VENTA:</strong> Tus datos nunca se comparten.</div><div style="padding:10px;background:rgba(124,58,237,.03);border:1px solid rgba(124,58,237,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#7C3AED">BORRADO TOTAL:</strong> Elimina todo cuando quieras.</div></div>`
 };
-function openModal(type) {
-  document.getElementById('modal-content').innerHTML = modals[type] || '';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(e) {
-  if (e.target === document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
+function openModal(type){document.getElementById('modal-content').innerHTML=modals[type]||'';document.getElementById('modal-overlay').classList.add('open');}
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');}
+
+// ── PWA ───────────────────────────────────────────
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+function installApp(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast('✅ APP INSTALADA');deferredPrompt=null;});}
+  else{showToast('ABRE EN CHROME PARA INSTALAR');}
 }
 
-// ═══════════════════════════════════════════════════
-// PWA
-// ═══════════════════════════════════════════════════
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
-function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r => {
-      if (r.outcome === 'accepted') showToast('✅ APP INSTALADA CORRECTAMENTE');
-      deferredPrompt = null;
-    });
-  } else {
-    showToast('ABRE EN CHROME/SAFARI PARA INSTALAR');
-  }
+// ── SERVICE WORKER ────────────────────────────────
+let swReg=null;
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(reg=>{
+    swReg=reg;
+    reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)document.getElementById('update-banner').classList.add('show');});});
+    setInterval(()=>reg.update(),30*60*1000);
+  }).catch(()=>{});
 }
+function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});showToast('🔄 ACTUALIZANDO...');setTimeout(()=>location.reload(),800);}
+navigator.serviceWorker?.addEventListener('controllerchange',()=>location.reload());
 
-// ═══════════════════════════════════════════════════
-// SERVICE WORKER
-// ═══════════════════════════════════════════════════
-let swReg = null;
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    swReg = reg;
-    reg.addEventListener('updatefound', () => {
-      const nw = reg.installing;
-      nw.addEventListener('statechange', () => {
-        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-          document.getElementById('update-banner').classList.add('show');
-        }
-      });
-    });
-    setInterval(() => reg.update(), 30 * 60 * 1000);
-  }).catch(() => {});
-}
-function applyUpdate() {
-  if (swReg && swReg.waiting) swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
-  showToast('🔄 APLICANDO ACTUALIZACIÓN...');
-  setTimeout(() => location.reload(), 800);
-}
-navigator.serviceWorker?.addEventListener('controllerchange', () => location.reload());
-
-// ═══════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════
-window.addEventListener('load', () => {
-  // Animate loading bar
-  let progress = 0;
-  const bar = document.getElementById('load-bar');
-  const loadText = document.getElementById('load-text');
-  const messages = ['INICIANDO SISTEMA...', 'CARGANDO MÓDULOS IA...', 'CALIBRANDO SENSORES...', 'SINCRONIZANDO DATOS...', 'LISTO'];
-  let msgIdx = 0;
-  const interval = setInterval(() => {
-    progress += Math.random() * 15 + 5;
-    if (progress >= 100) { progress = 100; clearInterval(interval); }
-    bar.style.width = progress + '%';
-    if (progress > msgIdx * 25 && msgIdx < messages.length) {
-      loadText.textContent = messages[msgIdx++];
-    }
-  }, 120);
-
-  setTimeout(() => {
-    let savedUser = null;
-    try { const s = localStorage.getItem('sq_user'); if (s) savedUser = JSON.parse(s); } catch(e) {}
-    const splash = document.getElementById('splash');
-    splash.classList.add('hidden');
-    setTimeout(() => splash.style.display = 'none', 500);
-    if (savedUser) {
-      currentUser = savedUser;
-      showApp(savedUser);
-    } else {
-      const ls = document.getElementById('login-screen');
-      ls.style.display = 'flex';
-      setTimeout(() => { ls.classList.remove('hidden'); initParticles('login-particles'); }, 50);
-    }
-  }, 2800);
+// ── BOOT ──────────────────────────────────────────
+window.addEventListener('load',()=>{
+  let p=0;
+  const bar=document.getElementById('lbar'),txt=document.getElementById('ltxt');
+  const msgs=['INICIANDO...','CARGANDO IA...','CALIBRANDO...','LISTO'];
+  let mi=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*18+6;if(p>=100){p=100;clearInterval(iv);}
+    bar.style.width=p+'%';
+    if(p>mi*30&&mi<msgs.length)txt.textContent=msgs[mi++];
+  },100);
+  setTimeout(()=>{
+    let saved=null;try{const s=localStorage.getItem('sq_user');if(s)saved=JSON.parse(s);}catch(e){}
+    const splash=document.getElementById('splash');
+    splash.classList.add('hidden');setTimeout(()=>splash.style.display='none',400);
+    if(saved){currentUser=saved;showApp(saved);}
+    else{const ls=document.getElementById('login-screen');ls.style.display='flex';setTimeout(()=>ls.classList.remove('hidden'),50);}
+  },2400);
 });
 </script>
 </body>
