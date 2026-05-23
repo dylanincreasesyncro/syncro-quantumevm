@@ -1,628 +1,407 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#000008"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Syncro Q"/>
-<link rel="manifest" href="/manifest.json"/>
-<title>Syncro Quantum</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Syncro Q">
+<meta name="theme-color" content="#000008">
+<title>Syncro Quantum — Tu Coach IA Personal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:#000008;color:#F0F4FF;font-family:'Exo 2',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+  :root {
+    --azul: #042C53;
+    --azul-m: #0C447C;
+    --azul-c: #378ADD;
+    --azul-s: #B5D4F4;
+    --blanco: #E6F1FB;
+    --gris: #85B7EB;
+    --verde: #1D9E75;
+    --amber: #BA7517;
+    --coral: #993C1D;
+    --bg: #000008;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--blanco); overflow-x: hidden; }
 
-/* ── GRID BG ── */
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,255,.04)1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.04)1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+  /* NAV */
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,8,0.8); backdrop-filter:blur(12px); border-bottom:0.5px solid rgba(55,138,221,0.2); }
+  .nav-logo { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--azul-c); letter-spacing:2px; }
+  .nav-links { display:flex; gap:24px; }
+  .nav-links a { color:var(--gris); text-decoration:none; font-size:13px; font-weight:500; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--azul-c); }
+  .nav-cta { background:var(--azul-c); color:white; padding:8px 20px; border-radius:20px; font-size:13px; font-weight:500; text-decoration:none; }
+  @media(max-width:600px){ .nav-links{display:none;} }
 
-/* ── APP ── */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:500px;margin:0 auto;position:relative;z-index:1;opacity:0;transition:opacity .4s}
-#app.visible{opacity:1}
+  /* HERO */
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, rgba(55,138,221,0.12) 0%, transparent 70%); pointer-events:none; }
+  .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(55,138,221,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(55,138,221,0.05) 1px,transparent 1px); background-size:60px 60px; pointer-events:none; }
+  .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(55,138,221,0.15); border:0.5px solid rgba(55,138,221,0.4); color:var(--azul-s); padding:8px 16px; border-radius:20px; font-size:12px; font-weight:500; letter-spacing:2px; margin-bottom:28px; }
+  .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--verde); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(40px,8vw,88px); font-weight:800; line-height:1.0; margin-bottom:24px; letter-spacing:-2px; }
+  .hero h1 span { color:var(--azul-c); }
+  .hero-sub { font-size:clamp(15px,2.5vw,20px); color:var(--gris); max-width:560px; line-height:1.7; margin-bottom:40px; font-weight:300; }
+  .hero-btns { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:60px; }
+  .btn-p { background:var(--azul-c); color:white; padding:16px 32px; border-radius:8px; text-decoration:none; font-weight:600; font-size:15px; transition:transform 0.2s; }
+  .btn-p:hover { transform:translateY(-2px); }
+  .btn-s { border:0.5px solid rgba(55,138,221,0.5); color:var(--azul-s); padding:16px 32px; border-radius:8px; text-decoration:none; font-weight:500; font-size:15px; transition:background 0.2s; }
+  .btn-s:hover { background:rgba(55,138,221,0.1); }
+  .hero-stats { display:flex; gap:48px; flex-wrap:wrap; justify-content:center; }
+  .stat { text-align:center; }
+  .stat-n { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:var(--azul-c); display:block; }
+  .stat-l { font-size:12px; color:var(--gris); letter-spacing:1px; text-transform:uppercase; }
 
-/* ── SCREENS ── */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:100;background:#000008;transition:opacity .4s,transform .4s}
-.screen.hidden{opacity:0;pointer-events:none;transform:scale(.96)}
+  /* COACH SECTION */
+  .section { padding:80px 24px; max-width:900px; margin:0 auto; }
+  .section-tag { font-size:11px; letter-spacing:4px; color:var(--azul-c); text-transform:uppercase; margin-bottom:12px; font-weight:500; }
+  .section-title { font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,48px); font-weight:800; margin-bottom:16px; line-height:1.1; }
+  .section-sub { color:var(--gris); font-size:16px; line-height:1.7; margin-bottom:48px; max-width:560px; }
 
-/* ── HEADER ── */
-#header{flex-shrink:0;padding:10px 16px;background:rgba(0,0,8,.95);border-bottom:1px solid rgba(0,245,255,.12);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
-#header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF88,#7C3AED88,transparent)}
-.hlogo{display:flex;align-items:center;gap:8px}
-.hlogo-sq{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:10px;color:#000;letter-spacing:-1px}
-.hlogo-name{font-family:'Orbitron',sans-serif;font-weight:900;font-size:12px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
-.hright{display:flex;align-items:center;gap:8px}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#00FF88;box-shadow:0 0 8px #00FF88;animation:pulse 1.5s ease-in-out infinite}
+  /* COACH UI */
+  .coach-container { background:rgba(4,44,83,0.4); border:0.5px solid rgba(55,138,221,0.3); border-radius:20px; overflow:hidden; }
+  .coach-header { background:rgba(4,44,83,0.8); padding:16px 20px; display:flex; align-items:center; gap:12px; border-bottom:0.5px solid rgba(55,138,221,0.2); }
+  .coach-avatar { width:40px; height:40px; background:var(--azul-c); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:white; flex-shrink:0; }
+  .coach-status { display:flex; align-items:center; gap:6px; margin-left:auto; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--verde); animation:pulse 2s infinite; }
+  .modes { display:flex; gap:8px; padding:16px 20px; border-bottom:0.5px solid rgba(55,138,221,0.15); flex-wrap:wrap; background:rgba(0,0,8,0.3); }
+  .mode-btn { font-size:12px; padding:7px 14px; border-radius:20px; cursor:pointer; border:0.5px solid rgba(55,138,221,0.3); color:var(--gris); background:transparent; font-family:'Space Grotesk',sans-serif; transition:all 0.2s; }
+  .mode-btn.active { background:var(--azul-c); color:white; border-color:var(--azul-c); }
+  .mode-btn:hover:not(.active) { border-color:var(--azul-c); color:var(--azul-c); }
+  .messages { padding:20px; display:flex; flex-direction:column; gap:14px; min-height:320px; max-height:420px; overflow-y:auto; }
+  .messages::-webkit-scrollbar { width:4px; }
+  .messages::-webkit-scrollbar-track { background:transparent; }
+  .messages::-webkit-scrollbar-thumb { background:rgba(55,138,221,0.3); border-radius:2px; }
+  .msg-u { align-self:flex-end; background:var(--azul-m); color:var(--blanco); padding:10px 16px; border-radius:16px 16px 4px 16px; max-width:80%; font-size:14px; line-height:1.6; }
+  .msg-b { align-self:flex-start; background:rgba(4,44,83,0.6); border:0.5px solid rgba(55,138,221,0.25); padding:12px 16px; border-radius:4px 16px 16px 16px; max-width:85%; font-size:14px; line-height:1.7; color:var(--blanco); }
+  .msg-b .tag { font-size:10px; font-weight:600; color:var(--azul-c); letter-spacing:2px; margin-bottom:6px; display:block; }
+  .chips { padding:12px 20px; display:flex; flex-wrap:wrap; gap:8px; border-top:0.5px solid rgba(55,138,221,0.15); background:rgba(0,0,8,0.2); }
+  .chip { font-size:12px; padding:6px 14px; border-radius:20px; cursor:pointer; border:0.5px solid rgba(55,138,221,0.35); color:var(--azul-s); background:transparent; font-family:'Space Grotesk',sans-serif; transition:all 0.2s; }
+  .chip:hover { background:var(--azul-c); color:white; border-color:var(--azul-c); }
+  .input-area { padding:14px 20px; display:flex; gap:10px; border-top:0.5px solid rgba(55,138,221,0.2); background:rgba(4,44,83,0.5); }
+  .input-area textarea { flex:1; background:rgba(0,0,8,0.4); border:0.5px solid rgba(55,138,221,0.3); color:var(--blanco); font-family:'Space Grotesk',sans-serif; font-size:14px; padding:10px 14px; border-radius:10px; resize:none; min-height:42px; max-height:100px; outline:none; }
+  .input-area textarea::placeholder { color:rgba(133,183,235,0.5); }
+  .input-area textarea:focus { border-color:var(--azul-c); }
+  .send-btn { background:var(--azul-c); border:none; color:white; width:42px; height:42px; border-radius:10px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s; }
+  .send-btn:hover { background:var(--azul-m); }
+  .send-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .typing { display:flex; gap:5px; align-items:center; padding:6px 0; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--azul-c); animation:bounce 1s infinite; }
+  .dot:nth-child(2){animation-delay:0.15s;} .dot:nth-child(3){animation-delay:0.3s;}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-7px);}}
 
-/* ── PAGES ── */
-#pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(24px);transition:opacity .3s ease,transform .3s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.page::-webkit-scrollbar{display:none}
-.page.active{opacity:1;pointer-events:all;transform:translateX(0)}
-.page-inner{padding:14px 14px 90px}
+  /* FEATURES */
+  .features { background:rgba(4,44,83,0.2); border-radius:24px; padding:60px 40px; margin:0 24px; }
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; max-width:900px; margin:0 auto; }
+  .feature-card { background:rgba(4,44,83,0.4); border:0.5px solid rgba(55,138,221,0.2); border-radius:16px; padding:28px; transition:transform 0.2s,border-color 0.2s; }
+  .feature-card:hover { transform:translateY(-4px); border-color:rgba(55,138,221,0.5); }
+  .feature-icon { font-size:28px; margin-bottom:16px; display:block; }
+  .feature-card h3 { font-size:16px; font-weight:600; margin-bottom:10px; color:var(--blanco); }
+  .feature-card p { font-size:13px; color:var(--gris); line-height:1.6; }
 
-/* ── TABBAR ── */
-#tabbar{flex-shrink:0;display:flex;background:rgba(0,0,8,.97);border-top:1px solid rgba(0,245,255,.1);padding:6px 2px calc(6px + env(safe-area-inset-bottom));position:relative;z-index:10}
-#tabbar::before{content:'';position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF44,#7C3AED44,transparent)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border:none;background:none;cursor:pointer;border-radius:8px;position:relative}
-.tab-icon{font-size:18px;filter:grayscale(1)opacity(.4);transition:all .2s}
-.tab.active .tab-icon{filter:none;transform:scale(1.15)}
-.tab-label{font-size:9px;color:#334155;font-family:'Orbitron',sans-serif;letter-spacing:.3px;transition:color .2s}
-.tab.active .tab-label{color:#00F5FF}
-.tab-line{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:16px;height:2px;border-radius:2px;opacity:0;transition:opacity .2s}
-.tab.active .tab-line{opacity:1}
-.tab-badge{position:absolute;top:2px;right:calc(50% - 14px);width:7px;height:7px;border-radius:50%;background:#FF006E;border:1.5px solid #000008;display:none;box-shadow:0 0 6px #FF006E}
-.tab-badge.show{display:block}
+  /* PLANES */
+  .planes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+  .plan-card { background:rgba(4,44,83,0.3); border:0.5px solid rgba(55,138,221,0.25); border-radius:20px; padding:32px 28px; position:relative; transition:transform 0.2s; }
+  .plan-card:hover { transform:translateY(-4px); }
+  .plan-card.popular { border-color:var(--azul-c); background:rgba(55,138,221,0.1); }
+  .plan-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--azul-c); color:white; font-size:11px; font-weight:600; padding:4px 14px; border-radius:10px; letter-spacing:1px; white-space:nowrap; }
+  .plan-icon { font-size:28px; margin-bottom:16px; display:block; }
+  .plan-card h3 { font-size:18px; font-weight:700; margin-bottom:8px; }
+  .plan-price { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:var(--azul-c); margin-bottom:4px; }
+  .plan-price span { font-size:14px; font-weight:400; color:var(--gris); }
+  .plan-features { list-style:none; margin:20px 0 24px; display:flex; flex-direction:column; gap:10px; }
+  .plan-features li { font-size:13px; color:var(--gris); display:flex; align-items:center; gap:8px; }
+  .plan-features li::before { content:'✓'; color:var(--verde); font-weight:700; flex-shrink:0; }
+  .plan-btns { display:flex; flex-direction:column; gap:8px; }
+  .plan-btn { display:block; text-align:center; padding:12px; border-radius:10px; font-size:13px; font-weight:600; text-decoration:none; transition:opacity 0.2s; }
+  .plan-btn.paypal { background:#003087; color:white; }
+  .plan-btn.mp { background:#009EE3; color:white; }
+  .plan-btn:hover { opacity:0.85; }
+  .plan-trial { text-align:center; font-size:11px; color:var(--gris); margin-top:10px; }
 
-/* ── CARDS ── */
-.card{background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.1);border-radius:14px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,245,255,.02),transparent);pointer-events:none}
-
-/* ── BUTTONS ── */
-.btn-p{display:block;text-align:center;padding:13px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#FF006E);color:#fff;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:transform .15s;width:100%;box-shadow:0 4px 16px rgba(124,58,237,.3)}
-.btn-p:active{transform:scale(.97)}
-.btn-c{display:block;text-align:center;padding:12px;border-radius:10px;background:linear-gradient(135deg,#00FF88,#00F5FF);color:#000;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;text-decoration:none;border:none;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:transform .15s;width:100%;box-shadow:0 4px 16px rgba(0,255,136,.2)}
-.btn-c:active{transform:scale(.97)}
-.btn-o{display:block;text-align:center;padding:11px;border-radius:10px;background:transparent;color:#00F5FF;font-size:11px;font-weight:700;text-decoration:none;border:1.5px solid rgba(0,245,255,.25);cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;width:100%}
-.btn-o:active{background:rgba(0,245,255,.06)}
-.input{width:100%;background:rgba(0,245,255,.04);border:1.5px solid rgba(0,245,255,.12);border-radius:10px;padding:12px 14px;color:#F0F4FF;font-size:13px;outline:none;font-family:'Exo 2',sans-serif;transition:border-color .2s}
-.input:focus{border-color:#00F5FF;background:rgba(0,245,255,.07)}
-.input::placeholder{color:#1e293b}
-
-/* ── TAGS ── */
-.tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:8px;font-family:'Orbitron',sans-serif}
-.ttl{font-family:'Orbitron',sans-serif;font-size:clamp(17px,4vw,22px);font-weight:900;line-height:1.2;margin-bottom:6px;letter-spacing:.5px}
-.sub{font-size:12px;color:#475569;line-height:1.7;margin-bottom:18px}
-
-/* ── ANIMATIONS ── */
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes spinR{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes scan{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
-@keyframes lineGrow{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
-@keyframes glow{0%,100%{box-shadow:0 0 14px rgba(124,58,237,.4)}50%{box-shadow:0 0 28px rgba(124,58,237,.7),0 0 40px rgba(0,245,255,.2)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes rgb{0%,100%{background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E)}33%{background:linear-gradient(90deg,#FF006E,#00F5FF,#7C3AED)}66%{background:linear-gradient(90deg,#7C3AED,#FF006E,#00F5FF)}}
-@keyframes borderPulse{0%,100%{border-color:rgba(0,245,255,.12)}50%{border-color:rgba(0,245,255,.35)}}
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,20,.95);color:#00F5FF;padding:8px 18px;border-radius:6px;font-size:10px;font-weight:700;z-index:999;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(0,245,255,.25);box-shadow:0 0 16px rgba(0,245,255,.15);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
-#toast.show{opacity:1}
-
-/* UPDATE BANNER */
-#update-banner{position:fixed;bottom:78px;left:10px;right:10px;background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:11px 14px;border-radius:10px;z-index:998;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:800;transform:translateY(120%);transition:transform .4s cubic-bezier(.32,1.06,.67,1);font-family:'Orbitron',sans-serif;letter-spacing:.5px}
-#update-banner.show{transform:translateY(0)}
-.upd-btn{background:rgba(0,0,0,.25);color:#000;border:none;border-radius:5px;padding:5px 11px;font-weight:900;cursor:pointer;font-size:10px;font-family:'Orbitron',sans-serif}
-
-/* MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,8,.85);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-#modal-overlay.open{opacity:1;pointer-events:all}
-#modal{background:#00030f;border-radius:18px 18px 0 0;padding:22px 18px 36px;width:100%;max-width:500px;border:1px solid rgba(0,245,255,.12);border-bottom:none;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1.06,.67,1);position:relative}
-#modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00F5FF,#7C3AED,transparent)}
-#modal-overlay.open #modal{transform:translateY(0)}
+  /* FOOTER */
+  footer { text-align:center; padding:40px 24px; border-top:0.5px solid rgba(55,138,221,0.15); margin-top:80px; }
+  footer p { font-size:13px; color:var(--gris); }
 </style>
 </head>
 <body>
 
-<!-- ══ SPLASH ══ -->
-<div id="splash" class="screen">
-  <div style="text-align:center">
-    <div style="position:relative;width:120px;height:120px;margin:0 auto 20px">
-      <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.4);animation:spin 4s linear infinite"></div>
-      <div style="position:absolute;inset:10px;border-radius:50%;border:1px solid rgba(124,58,237,.5);animation:spinR 3s linear infinite"></div>
-      <div style="position:absolute;inset:20px;border-radius:50%;border:1px solid rgba(255,0,110,.35);animation:spin 6s linear infinite"></div>
-      <div style="position:absolute;inset:30px;border-radius:50%;background:rgba(0,245,255,.06);display:flex;align-items:center;justify-content:center">
-        <span style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
-      </div>
-    </div>
-    <div style="font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">SYNCRO QUANTUM</div>
-    <div style="font-size:9px;color:#1e293b;letter-spacing:4px;font-family:'Orbitron',sans-serif;margin-bottom:20px">ADAPTIVE INTELLIGENCE</div>
-    <div style="width:160px;height:2px;background:rgba(0,245,255,.08);border-radius:2px;margin:0 auto;overflow:hidden">
-      <div id="lbar" style="height:100%;width:0;background:linear-gradient(90deg,#7C3AED,#00F5FF);border-radius:2px;transition:width .08s linear;box-shadow:0 0 8px #00F5FF"></div>
-    </div>
-    <div id="ltxt" style="font-size:9px;color:#1e293b;margin-top:7px;font-family:'Orbitron',sans-serif;letter-spacing:2px">INICIANDO...</div>
+<nav>
+  <div class="nav-logo">SQ</div>
+  <div class="nav-links">
+    <a href="#coach">Coach IA</a>
+    <a href="#funciones">Funciones</a>
+    <a href="#planes">Planes</a>
   </div>
-</div>
+  <a href="#planes" class="nav-cta">Empezar gratis</a>
+</nav>
 
-<!-- ══ LOGIN ══ -->
-<div id="login-screen" class="screen hidden" style="overflow-y:auto">
-  <div style="width:100%;max-width:340px;position:relative;z-index:1;padding:10px 0">
-    <div style="text-align:center;margin-bottom:22px">
-      <div style="position:relative;width:70px;height:70px;margin:0 auto 14px">
-        <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.35);animation:spin 4s linear infinite"></div>
-        <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(124,58,237,.4);animation:spinR 3s linear infinite"></div>
-        <div style="position:absolute;inset:16px;border-radius:50%;background:rgba(0,245,255,.06);display:flex;align-items:center;justify-content:center">
-          <span style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
-        </div>
-      </div>
-      <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;margin-bottom:3px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">ACCESO AL SISTEMA</div>
-      <div style="font-size:10px;color:#1e293b;letter-spacing:2px;font-family:'Orbitron',sans-serif">SYNCRO QUANTUM v1.0</div>
-    </div>
-
-    <div style="background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.12);border-radius:14px;padding:20px;position:relative;overflow:hidden;animation:borderPulse 3s ease-in-out infinite">
-      <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,.3),transparent);animation:scan 3s ease-in-out infinite"></div>
-
-      <div style="margin-bottom:12px">
-        <div style="font-size:9px;color:#00F5FF;margin-bottom:5px;font-family:'Orbitron',sans-serif;letter-spacing:1px">ID DE USUARIO</div>
-        <input id="login-email" class="input" type="email" placeholder="usuario@sistema.com" autocomplete="email"/>
-      </div>
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <span style="font-size:9px;color:#00F5FF;font-family:'Orbitron',sans-serif;letter-spacing:1px">CLAVE DE ACCESO</span>
-          <span style="font-size:9px;color:#7C3AED;cursor:pointer;font-family:'Orbitron',sans-serif" onclick="showToast('REVISA TU CORREO')">¿OLVIDASTE?</span>
-        </div>
-        <div style="position:relative">
-          <input id="login-pass" class="input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:40px"/>
-          <button onclick="togglePass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#334155;cursor:pointer;font-size:14px" id="eye-btn">👁</button>
-        </div>
-      </div>
-
-      <div id="login-error" style="display:none;background:rgba(255,0,110,.08);border:1px solid rgba(255,0,110,.25);border-radius:7px;padding:7px 11px;font-size:10px;color:#FF006E;margin-bottom:11px;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:.5px"></div>
-
-      <button onclick="doLogin()" id="login-btn" class="btn-p" style="margin-bottom:10px">⚡ INICIAR SESIÓN</button>
-
-      <div style="text-align:center;font-size:10px;color:#1e293b;margin-bottom:14px;font-family:'Orbitron',sans-serif">
-        ¿SIN CUENTA? <span style="color:#00F5FF;cursor:pointer" onclick="goTab('planes');hideLogin()">ACCESO GRATUITO →</span>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
-        <div style="flex:1;height:1px;background:rgba(0,245,255,.08)"></div>
-        <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">O CONTINÚA</span>
-        <div style="flex:1;height:1px;background:rgba(0,245,255,.08)"></div>
-      </div>
-
-      <button onclick="googleLogin()" style="width:100%;padding:11px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#F0F4FF;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Exo 2',sans-serif">
-        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
-        Continuar con Google
-      </button>
-    </div>
-    <div style="text-align:center;margin-top:12px;font-size:9px;color:#0f172a;font-family:'Orbitron',sans-serif;letter-spacing:1px">🔐 CIFRADO CUÁNTICO · SIN VENTA DE DATOS</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-badge"><span class="dot"></span>COACH IA EN VIVO · 24/7</div>
+  <h1>Tu vida,<br><span>optimizada</span><br>por IA.</h1>
+  <p class="hero-sub">El coach de inteligencia artificial que te ayuda con bienestar, productividad, finanzas y motivación — en español, para Latinoamérica.</p>
+  <div class="hero-btns">
+    <a href="#coach" class="btn-p">Hablar con mi Coach IA</a>
+    <a href="#planes" class="btn-s">Ver planes →</a>
   </div>
-</div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-n">4</span><span class="stat-l">Modos de coach</span></div>
+    <div class="stat"><span class="stat-n">24/7</span><span class="stat-l">Disponible</span></div>
+    <div class="stat"><span class="stat-n">100%</span><span class="stat-l">En español</span></div>
+    <div class="stat"><span class="stat-n">IA</span><span class="stat-l">Real y funcional</span></div>
+  </div>
+</section>
 
-<!-- ══ APP ══ -->
-<div id="app">
-  <div id="header">
-    <div class="hlogo">
-      <div class="hlogo-sq">SQ</div>
-      <span class="hlogo-name">SYNCRO QUANTUM</span>
+<!-- COACH IA -->
+<section class="section" id="coach">
+  <p class="section-tag">Coach IA en vivo</p>
+  <h2 class="section-title">Habla con tu<br>coach ahora</h2>
+  <p class="section-sub">Elige tu modo y escríbele. Responde en segundos con consejos personalizados para tu situación.</p>
+
+  <div class="coach-container">
+    <div class="coach-header">
+      <div class="coach-avatar">SQ</div>
+      <div>
+        <p style="font-weight:600;font-size:14px;margin:0;">Syncro Quantum Coach</p>
+        <p style="font-size:12px;color:var(--gris);margin:0;">Tu IA personal</p>
+      </div>
+      <div class="coach-status">
+        <div class="status-dot"></div>
+        <span style="font-size:12px;color:var(--gris);">En línea</span>
+      </div>
     </div>
-    <div class="hright">
-      <div class="live-dot"></div>
-      <span id="user-chip" style="font-size:10px;color:#00F5FF;background:rgba(0,245,255,.07);padding:3px 9px;border-radius:5px;border:1px solid rgba(0,245,255,.15);font-family:'Orbitron',sans-serif;letter-spacing:.5px"></span>
-      <button style="background:none;border:none;color:#334155;font-size:16px;cursor:pointer" onclick="openModal('settings')">⚙️</button>
+
+    <div class="modes" id="modes">
+      <button class="mode-btn active" onclick="setMode('bienestar',this)">🧘 Bienestar</button>
+      <button class="mode-btn" onclick="setMode('productividad',this)">⚡ Productividad</button>
+      <button class="mode-btn" onclick="setMode('finanzas',this)">💰 Finanzas</button>
+      <button class="mode-btn" onclick="setMode('motivacion',this)">🔥 Motivación</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg-b">
+        <span class="tag">SQ COACH · BIENESTAR</span>
+        Hola, soy tu Coach IA de Syncro Quantum. Estoy aquí para apoyarte con bienestar, productividad, finanzas y motivación. ¿En qué te puedo ayudar hoy?
+      </div>
+    </div>
+
+    <div class="chips" id="chips">
+      <button class="chip" onclick="useChip(this)">Me siento estresado</button>
+      <button class="chip" onclick="useChip(this)">No puedo dormir bien</button>
+      <button class="chip" onclick="useChip(this)">Me falta energía</button>
+      <button class="chip" onclick="useChip(this)">Cómo manejar la ansiedad</button>
+    </div>
+
+    <div class="input-area">
+      <textarea id="input" placeholder="Escríbele a tu coach..." rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="send()" aria-label="Enviar">↑</button>
     </div>
   </div>
+</section>
 
-  <div id="pages">
-
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="page-inner">
-        <div style="text-align:center;padding:10px 0 18px">
-          <div style="position:relative;width:90px;height:90px;margin:0 auto 14px">
-            <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(0,245,255,.35);animation:spin 5s linear infinite"></div>
-            <div style="position:absolute;inset:9px;border-radius:50%;border:1px solid rgba(124,58,237,.4);animation:spinR 4s linear infinite"></div>
-            <div style="position:absolute;inset:18px;border-radius:50%;background:rgba(0,245,255,.05);display:flex;align-items:center;justify-content:center">
-              <span style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;background:linear-gradient(135deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SQ</span>
-            </div>
-          </div>
-          <div id="home-greeting" style="font-family:'Orbitron',sans-serif;font-size:clamp(16px,4vw,20px);font-weight:900;line-height:1.2;margin-bottom:7px;letter-spacing:.5px">
-            TU VIDA,<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">OPTIMIZADA POR IA.</span>
-          </div>
-          <p style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:14px;max-width:270px;margin-left:auto;margin-right:auto">La IA que te conoce mejor que tú mismo. Predice, actúa y mejora — antes de que lo necesites.</p>
-          <div style="display:flex;flex-direction:column;gap:9px">
-            <button class="btn-p" onclick="goTab('demos')">🎬 VER DEMOS EN VIVO</button>
-            <button class="btn-o" onclick="goTab('planes')">VER PLANES Y PRECIOS →</button>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#00F5FF,#00FF88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">12K+</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">USUARIOS</div></div>
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#FF006E,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RATING</div></div>
-          <div class="card" style="padding:11px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">98%</div><div style="font-size:8px;color:#1e293b;margin-top:2px;font-family:'Orbitron',sans-serif;letter-spacing:.5px">RENUEVAN</div></div>
-        </div>
-
-        <div style="font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;color:#1e293b;text-transform:uppercase;letter-spacing:2px;margin-bottom:9px">MÓDULOS ACTIVOS</div>
-        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px">
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🧠</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">COACH IA 24/7</div><div style="font-size:11px;color:#475569">Responde con contexto real</div></div><span style="color:#00F5FF;font-size:13px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(255,0,110,.07);border:1px solid rgba(255,0,110,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📷</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">BIO-SCANNER</div><div style="font-size:11px;color:#475569">Detecta estrés por cámara</div></div><span style="color:#FF006E;font-size:13px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔮</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">PREDICCIÓN CUÁNTICA</div><div style="font-size:11px;color:#475569">Tu estado, hora por hora</div></div><span style="color:#7C3AED;font-size:13px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('demos')"><div style="width:34px;height:34px;border-radius:9px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🌙</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px;margin-bottom:1px">DREAM ARCHITECT</div><div style="font-size:11px;color:#475569">Tu día preparado al despertar</div></div><span style="color:#00FF88;font-size:13px">›</span></div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="card" style="padding:11px 13px"><div style="color:#F59E0B;font-size:10px;margin-bottom:4px;letter-spacing:2px">★★★★★</div><div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:7px;font-style:italic">"Me dice lo que necesito escuchar antes de que yo lo sepa."</div><div style="display:flex;gap:7px;align-items:center"><div style="width:22px;height:22px;border-radius:5px;background:rgba(0,245,255,.1);border:1px solid rgba(0,245,255,.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#00F5FF;font-family:'Orbitron',sans-serif">MS</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">MARIANA S. · PLAN CREATIVA</div></div></div>
-          <div class="card" style="padding:11px 13px"><div style="color:#F59E0B;font-size:10px;margin-bottom:4px;letter-spacing:2px">★★★★★</div><div style="font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:7px;font-style:italic">"Ahorré más en el primer mes que en todo el año anterior."</div><div style="display:flex;gap:7px;align-items:center"><div style="width:22px;height:22px;border-radius:5px;background:rgba(255,0,110,.1);border:1px solid rgba(255,0,110,.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#FF006E;font-family:'Orbitron',sans-serif">JR</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">JORGE R. · PLAN INTELIGENTE</div></div></div>
-        </div>
+<!-- FUNCIONES -->
+<section id="funciones" style="padding:0 0 80px;">
+  <div class="features">
+    <div style="text-align:center;max-width:600px;margin:0 auto 48px;">
+      <p class="section-tag" style="text-align:center;">Lo que hace Syncro Quantum</p>
+      <h2 class="section-title">IA real que<br>realmente funciona</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <h3>Coach IA 24/7</h3>
+        <p>Inteligencia artificial real que responde con contexto y consejos personalizados para tu situación específica.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌍</span>
+        <h3>100% en español</h3>
+        <p>Diseñado para México y Latinoamérica. Entiende tu contexto, cultura y economía local.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3>4 modos especializados</h3>
+        <p>Bienestar, productividad, finanzas y motivación. Cada modo con un coach entrenado específicamente.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>Privacidad total</h3>
+        <p>Tus conversaciones son privadas. Sin venta de datos. Sin publicidad. Tu información es tuya.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📱</span>
+        <h3>Funciona en todo</h3>
+        <p>En tu celular, tablet o computadora. Sin descargas necesarias. Accede desde cualquier navegador.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Respuesta instantánea</h3>
+        <p>Sin esperas. Tu coach responde en segundos con información relevante y accionable.</p>
       </div>
     </div>
-
-    <!-- DEMOS -->
-    <div class="page" id="page-demos">
-      <div class="page-inner">
-        <div style="margin-bottom:16px">
-          <div class="tag" style="background:rgba(124,58,237,.1);color:#7C3AED;border:1px solid rgba(124,58,237,.2)">MÓDULOS EN VIVO</div>
-          <div class="ttl">MÍRALO FUNCIONAR<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">EN TIEMPO REAL</span></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:9px">
-
-          <div class="card" style="overflow:hidden">
-            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d1')">
-              <div style="width:38px;height:38px;border-radius:10px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">COACH IA EN VIVO</div><div style="font-size:10px;color:#475569;margin-top:1px">Conversación real con contexto</div></div>
-              <span id="d1-arrow" style="color:#00F5FF;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
-            </div>
-            <div id="d1" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 12px 12px">
-                <div style="background:#00030a;border:1px solid rgba(0,245,255,.1);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:9px">
-                  <div style="display:flex;justify-content:flex-end"><div style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;padding:8px 11px;border-radius:11px 11px 3px 11px;max-width:78%;font-size:11px;line-height:1.5;font-weight:600">Estoy muy cansado y tengo reunión en 1h.</div></div>
-                  <div style="display:flex;gap:7px;align-items:flex-start">
-                    <div style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">🤖</div>
-                    <div style="background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.1);border-radius:3px 11px 11px 11px;padding:9px 11px;font-size:11px;line-height:1.6;color:#94A3B8">
-                      <strong style="color:#00FF88">FATIGA MEDIA.</strong> 58 min antes.<br>⚡ <strong style="color:#F0F4FF">AHORA:</strong> 10 min sin pantalla.<br>🎯 <strong style="color:#F0F4FF">REUNIÓN:</strong> Llegas al 78%.
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:6px">
-                    <div style="padding:4px 9px;border-radius:5px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);color:#00FF88;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">✓ DESCANSO</div>
-                    <div style="padding:4px 9px;border-radius:5px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.18);color:#00F5FF;font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif">📅 AGENDA</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="overflow:hidden">
-            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d2')">
-              <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,0,110,.1);border:1px solid rgba(255,0,110,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📷</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">BIO-SCANNER</div><div style="font-size:10px;color:#475569;margin-top:1px">Escaneo facial cuántico</div></div>
-              <span id="d2-arrow" style="color:#FF006E;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
-            </div>
-            <div id="d2" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 12px 12px">
-                <div style="background:#00030a;border:1px solid rgba(255,0,110,.1);border-radius:10px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px">
-                  <div style="position:relative;width:110px;height:110px">
-                    <div style="position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(0,255,136,.25);animation:pulse 2s ease-in-out infinite"></div>
-                    <div style="position:absolute;inset:0;border-radius:50%;background:#000a10;border:2px solid #00FF88;overflow:hidden">
-                      <svg width="100%" height="100%" viewBox="0 0 110 110"><circle cx="55" cy="50" r="30" fill="#100808" opacity=".8"/><ellipse cx="44" cy="44" rx="6" ry="7" fill="#00030f"/><ellipse cx="66" cy="44" rx="6" ry="7" fill="#00030f"/><circle cx="44" cy="44" r="3.5" fill="#00F5FF" opacity=".5"/><circle cx="66" cy="44" r="3.5" fill="#00F5FF" opacity=".5"/><circle cx="45.5" cy="42.5" r="1.3" fill="#fff"/><circle cx="67.5" cy="42.5" r="1.3" fill="#fff"/><path d="M50 57 Q55 63 60 57" fill="none" stroke="rgba(0,245,255,.3)" stroke-width="1.5" stroke-linecap="round"/><path d="M45 68 Q55 74 65 68" fill="none" stroke="rgba(0,245,255,.25)" stroke-width="1.5" stroke-linecap="round"/></svg>
-                      <div style="position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,#00FF88,transparent);animation:scan 2.5s ease-in-out infinite"></div>
-                    </div>
-                    <div style="position:absolute;top:2px;left:2px;width:11px;height:11px;border-top:2px solid #00FF88;border-left:2px solid #00FF88"></div>
-                    <div style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-top:2px solid #00FF88;border-right:2px solid #00FF88"></div>
-                    <div style="position:absolute;bottom:2px;left:2px;width:11px;height:11px;border-bottom:2px solid #00FF88;border-left:2px solid #00FF88"></div>
-                    <div style="position:absolute;bottom:2px;right:2px;width:11px;height:11px;border-bottom:2px solid #00FF88;border-right:2px solid #00FF88"></div>
-                  </div>
-                  <div style="font-size:9px;color:#00FF88;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:1px;display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#00FF88;animation:pulse 1s ease-in-out infinite"></span>LEYENDO SEÑALES...</div>
-                  <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ESTRÉS</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#F59E0B">4<span style="font-size:9px;color:#1e293b">/10</span></div></div>
-                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ENERGÍA</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#00FF88">7<span style="font-size:9px;color:#1e293b">/10</span></div></div>
-                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">ESTADO</div><div style="font-size:11px;font-weight:700;color:#00F5FF;font-family:'Orbitron',sans-serif">FOCUS</div></div>
-                    <div class="card" style="padding:8px 10px"><div style="font-size:8px;color:#1e293b;margin-bottom:2px;font-family:'Orbitron',sans-serif">PRECISIÓN</div><div style="font-size:11px;font-weight:700;color:#7C3AED;font-family:'Orbitron',sans-serif">94%</div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="overflow:hidden">
-            <div style="padding:12px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="toggleDemo('d3')">
-              <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🌅</div>
-              <div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">DREAM ARCHITECT</div><div style="font-size:10px;color:#475569;margin-top:1px">Briefing matutino de IA</div></div>
-              <span id="d3-arrow" style="color:#00FF88;font-size:11px;transition:transform .3s;font-family:'Orbitron',sans-serif">▼</span>
-            </div>
-            <div id="d3" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
-              <div style="padding:0 12px 12px">
-                <div style="background:#00030a;border:1px solid rgba(0,255,136,.1);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:9px">
-                  <div style="text-align:center"><div style="font-size:20px;margin-bottom:4px">🌅</div><div style="font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:1px">BUENOS DÍAS, CARLOS</div><div style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif;letter-spacing:1px">07:15 AM</div></div>
-                  <div class="card" style="padding:9px 11px;background:rgba(99,179,237,.05);border-color:rgba(99,179,237,.12)"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif">🌙 SUEÑO</span><span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:#63B3ED">86%</span></div><div style="font-size:10px;color:#1e293b;font-family:'Orbitron',sans-serif">7.5H · 2 REM · ÓPTIMO</div></div>
-                  <div style="padding:7px 10px;background:rgba(0,255,136,.05);border-radius:8px;border-left:2px solid #00FF88;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#00FF88">09:00–11:30</strong> · <span style="color:#475569">VENTANA MÁXIMA FOCO</span></div>
-                  <div style="padding:7px 10px;background:rgba(255,0,110,.04);border-radius:8px;border-left:2px solid #FF006E;font-size:10px;font-family:'Orbitron',sans-serif"><strong style="color:#FF006E">15:00–16:30</strong> · <span style="color:#475569">BAJA DE ENERGÍA</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- PLANES -->
-    <div class="page" id="page-planes">
-      <div class="page-inner">
-        <div style="margin-bottom:16px">
-          <div class="tag" style="background:rgba(0,255,136,.07);color:#00FF88;border:1px solid rgba(0,255,136,.18)">SELECCIONAR PLAN</div>
-          <div class="ttl">3 PLANES,<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">UN UNIVERSO</span></div>
-          <div style="font-size:12px;color:#475569;margin-bottom:0">Todos incluyen <strong style="color:#00FF88">3 días gratis</strong>. Sin tarjeta.</div>
-        </div>
-
-        <!-- CREATIVA -->
-        <div style="border-radius:14px;padding:16px;margin-bottom:10px;background:linear-gradient(145deg,#080012,#04000a);border:1.5px solid rgba(255,0,110,.25);position:relative;overflow:hidden">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#FF006E88,transparent)"></div>
-          <div style="position:absolute;top:10px;right:10px;font-size:8px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(255,0,110,.12);border:1px solid rgba(255,0,110,.3);color:#FF006E;font-family:'Orbitron',sans-serif;letter-spacing:.8px">POPULAR</div>
-          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#7C3AED,#FF006E);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(255,0,110,.2)">🎨</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">CREATIVA</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:9px">Tu estudio creativo inteligente</div>
-          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Gestión de proyectos con IA</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Captura ilimitada de ideas</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Seguimiento de ingresos</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#FF006E">›</span>Coach creativo diario</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$89</span>
-            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
-          </div>
-          <!-- PAGO PAYPAL -->
-          <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#7C3AED,#FF006E);margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
-          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
-        </div>
-
-        <!-- BIENESTAR -->
-        <div style="border-radius:14px;padding:16px;margin-bottom:10px;background:linear-gradient(145deg,#001408,#000d05);border:1.5px solid rgba(0,255,136,.2);position:relative;overflow:hidden">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00FF8888,transparent)"></div>
-          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#00FF88,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(0,255,136,.15)">🌿</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">BIENESTAR</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:9px">Vive en armonía, sin estrés</div>
-          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Monitor sueño, estrés y energía</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Meditaciones y guías diarias</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Plan de alimentación consciente</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#00FF88">›</span>Programa personalizado 30 días</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#00FF88,#00F5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$79</span>
-            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
-          </div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" target="_blank" class="btn-c" style="margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
-          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
-        </div>
-
-        <!-- INTELIGENTE -->
-        <div style="border-radius:14px;padding:16px;background:linear-gradient(145deg,#0c0800,#070500);border:1.5px solid rgba(245,158,11,.2);position:relative;overflow:hidden">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#F59E0B88,transparent)"></div>
-          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px;box-shadow:0 0 14px rgba(245,158,11,.15)">⚡</div>
-          <div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:2px;letter-spacing:.8px">INTELIGENTE</div>
-          <div style="font-size:11px;color:#475569;margin-bottom:9px">Cada peso, en su lugar</div>
-          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:11px">
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Control de gastos en tiempo real</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Alertas de pagos y ofertas</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Plan de compras optimizado</div>
-            <div style="display:flex;gap:6px;font-size:11px;color:#94A3B8"><span style="color:#F59E0B">›</span>Plan financiero 30 días</div>
-          </div>
-          <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:11px">
-            <span style="font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;background:linear-gradient(90deg,#F59E0B,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">$49</span>
-            <span style="font-size:9px;color:#1e293b;font-family:'Orbitron',sans-serif">/MES · 3 DÍAS GRATIS</span>
-          </div>
-          <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" target="_blank" class="btn-p" style="background:linear-gradient(135deg,#F59E0B,#EF4444);box-shadow:0 4px 14px rgba(245,158,11,.2);margin-bottom:6px">💙 PAGAR CON PAYPAL</a>
-          <a href="https://link.mercadopago.com.mx/victorpay" target="_blank" style="display:block;text-align:center;padding:11px;border-radius:10px;background:rgba(0,188,242,.08);border:1px solid rgba(0,188,242,.2);color:#00BCF2;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px">🔵 MERCADO PAGO</a>
-        </div>
-        <div style="text-align:center;margin-top:11px;font-size:9px;color:#0f172a;font-family:'Orbitron',sans-serif;letter-spacing:.8px">PAGO SEGURO · CANCELA CUANDO QUIERAS</div>
-      </div>
-    </div>
-
-    <!-- REFERIDOS -->
-    <div class="page" id="page-referidos">
-      <div class="page-inner">
-        <div style="text-align:center;margin-bottom:18px">
-          <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 11px;animation:glow 3s ease-in-out infinite">🎁</div>
-          <div class="tag" style="background:rgba(0,255,136,.07);color:#00FF88;border:1px solid rgba(0,255,136,.18)">PROGRAMA QUANTUM</div>
-          <div class="ttl">INVITA · GANA ·<br><span style="background:linear-gradient(90deg,#00F5FF,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">COMPARTE</span></div>
-          <div style="font-size:12px;color:#475569;line-height:1.6">Invita un amigo y <strong style="color:#00FF88">ambos ganan 1 mes gratis</strong>.</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
-          <div class="card" style="padding:13px;text-align:center;border-color:rgba(124,58,237,.18)"><div style="font-size:18px;margin-bottom:4px">🙋</div><div style="font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;color:#7C3AED;margin-bottom:1px;letter-spacing:.5px">TÚ GANAS</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900">1 MES</div><div style="font-size:9px;color:#1e293b;margin-top:1px">gratis por amigo</div></div>
-          <div class="card" style="padding:13px;text-align:center;border-color:rgba(0,255,136,.18)"><div style="font-size:18px;margin-bottom:4px">🤝</div><div style="font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;color:#00FF88;margin-bottom:1px;letter-spacing:.5px">TU AMIGO</div><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900">1 MES</div><div style="font-size:9px;color:#1e293b;margin-top:1px">al suscribirse</div></div>
-        </div>
-        <div class="card" style="padding:12px;margin-bottom:10px">
-          <div style="font-size:8px;color:#1e293b;margin-bottom:6px;font-family:'Orbitron',sans-serif;letter-spacing:1px;font-weight:700">TU LINK DE REFERIDO</div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <div style="flex:1;font-family:monospace;font-size:10px;color:#00F5FF;background:rgba(0,245,255,.04);padding:7px 9px;border-radius:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(0,245,255,.12)">syncroquantume.netlify.app/ref/TU-CODIGO</div>
-            <button id="refCopyBtn" onclick="copyRef()" style="background:linear-gradient(135deg,#7C3AED,#00F5FF);color:#000;border:none;border-radius:7px;padding:7px 11px;font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap;font-family:'Orbitron',sans-serif;letter-spacing:.3px">COPIAR</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button onclick="shareWA()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:9px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);color:#25D366;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.3px">💬 WHATSAPP</button>
-          <button onclick="shareOther(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:9px;background:rgba(255,0,110,.07);border:1px solid rgba(255,0,110,.2);color:#FF006E;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron',sans-serif;letter-spacing:.3px">📸 COMPARTIR</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PERFIL -->
-    <div class="page" id="page-perfil">
-      <div class="page-inner">
-        <div style="text-align:center;padding:12px 0 18px">
-          <div style="position:relative;display:inline-block;margin-bottom:11px">
-            <div id="profile-avatar" style="width:68px;height:68px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#00F5FF);display:flex;align-items:center;justify-content:center;font-size:28px;animation:glow 3s ease-in-out infinite">😊</div>
-            <div style="position:absolute;bottom:-3px;right:-3px;width:18px;height:18px;border-radius:5px;background:#00FF88;border:2px solid #000008;display:flex;align-items:center;justify-content:center;font-size:9px">✓</div>
-          </div>
-          <div id="profile-name" style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;margin-bottom:2px;letter-spacing:1px">MI PERFIL</div>
-          <div id="profile-email-display" style="font-size:10px;color:#1e293b;margin-bottom:7px;font-family:'Orbitron',sans-serif;letter-spacing:.3px"></div>
-          <div style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:5px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.18);font-size:9px;font-weight:700;color:#00FF88;font-family:'Orbitron',sans-serif;letter-spacing:1px"><span style="width:5px;height:5px;border-radius:50%;background:#00FF88;animation:pulse 1.5s infinite"></span>SISTEMA ACTIVO</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:16px">
-          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#7C3AED">14</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">DÍAS</div></div>
-          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#00FF88">94%</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">PRECISIÓN</div></div>
-          <div class="card" style="padding:10px;text-align:center"><div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:#F59E0B">7</div><div style="font-size:8px;color:#1e293b;margin-top:1px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">PATRONES</div></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('planes')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;font-size:14px">💎</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">MI PLAN</div><div style="font-size:10px;color:#475569">Plan Creativa · $89/mes</div></div><span style="color:#00F5FF;font-size:12px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="goTab('referidos')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🎁</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">INVITAR AMIGOS</div><div style="font-size:10px;color:#475569">1 mes gratis por cada uno</div></div><span style="color:#00FF88;font-size:12px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="installApp()"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,245,255,.07);border:1px solid rgba(0,245,255,.14);display:flex;align-items:center;justify-content:center;font-size:14px">📲</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">INSTALAR APP</div><div style="font-size:10px;color:#475569">Añadir a pantalla de inicio</div></div><span style="color:#00F5FF;font-size:12px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="openModal('privacy')"><div style="width:32px;height:32px;border-radius:8px;background:rgba(99,179,237,.07);border:1px solid rgba(99,179,237,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🔐</div><div style="flex:1"><div style="font-size:11px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.3px">SEGURIDAD</div><div style="font-size:10px;color:#475569">Cifrado total · Sin venta</div></div><span style="color:#63B3ED;font-size:12px">›</span></div>
-          <div class="card" style="padding:11px 13px;display:flex;gap:10px;align-items:center;cursor:pointer" onclick="doLogout()"><div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);display:flex;align-items:center;justify-content:center;font-size:14px">🚪</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#EF4444;font-family:'Orbitron',sans-serif;letter-spacing:.3px">CERRAR SESIÓN</div><div style="font-size:10px;color:#475569">Salir del sistema</div></div><span style="color:#EF4444;font-size:12px">›</span></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- pages -->
-
-  <!-- TABBAR -->
-  <div id="tabbar">
-    <button class="tab active" onclick="goTab('home')" id="tab-home"><span class="tab-icon">🏠</span><span class="tab-label" style="color:#00F5FF">INICIO</span><div class="tab-line" style="background:#00F5FF;box-shadow:0 0 6px #00F5FF;opacity:1"></div></button>
-    <button class="tab" onclick="goTab('demos')" id="tab-demos"><span class="tab-icon">🎬</span><span class="tab-label">DEMOS</span><div class="tab-line" style="background:#FF006E"></div></button>
-    <button class="tab" onclick="goTab('planes')" id="tab-planes"><span class="tab-icon">💎</span><span class="tab-label">PLANES</span><div class="tab-line" style="background:#00FF88"></div></button>
-    <button class="tab" onclick="goTab('referidos')" id="tab-referidos"><span class="tab-icon">🎁</span><span class="tab-label">INVITAR</span><div class="tab-line" style="background:#F59E0B"></div><div class="tab-badge show" id="badge-referidos"></div></button>
-    <button class="tab" onclick="goTab('perfil')" id="tab-perfil"><span class="tab-icon">👤</span><span class="tab-label">PERFIL</span><div class="tab-line" style="background:#7C3AED"></div></button>
   </div>
-</div><!-- app -->
+</section>
 
-<!-- UPDATE BANNER -->
-<div id="update-banner">
-  <span>✨ NUEVA VERSIÓN</span>
-  <button class="upd-btn" onclick="applyUpdate()">ACTUALIZAR</button>
-</div>
+<!-- PLANES -->
+<section class="section" id="planes">
+  <p class="section-tag">Elige tu plan</p>
+  <h2 class="section-title">3 días gratis<br>sin tarjeta</h2>
+  <p class="section-sub">Prueba tu coach IA sin compromiso. Cancela cuando quieras.</p>
 
-<!-- TOAST -->
-<div id="toast"></div>
+  <div class="planes-grid">
+    <div class="plan-card">
+      <span class="plan-icon">⚡</span>
+      <h3>Inteligente</h3>
+      <div class="plan-price">$49<span>/mes</span></div>
+      <ul class="plan-features">
+        <li>Coach IA de finanzas</li>
+        <li>Control de gastos</li>
+        <li>Plan financiero 30 días</li>
+        <li>Alertas de pagos</li>
+        <li>3 días gratis</li>
+      </ul>
+      <div class="plan-btns">
+        <a href="https://www.paypal.com/paypalme/dylanincrease/49USD" class="plan-btn paypal" target="_blank">💙 PayPal</a>
+        <a href="https://link.mercadopago.com.mx/victorpay" class="plan-btn mp" target="_blank">🔵 Mercado Pago</a>
+      </div>
+      <p class="plan-trial">✓ 3 días gratis · Sin tarjeta</p>
+    </div>
 
-<!-- MODAL -->
-<div id="modal-overlay" onclick="closeModal(event)">
-  <div id="modal">
-    <div id="modal-content"></div>
+    <div class="plan-card popular">
+      <div class="plan-badge">MÁS POPULAR</div>
+      <span class="plan-icon">🎨</span>
+      <h3>Creativa</h3>
+      <div class="plan-price">$89<span>/mes</span></div>
+      <ul class="plan-features">
+        <li>Coach IA de productividad</li>
+        <li>Gestión de proyectos</li>
+        <li>Coach creativo diario</li>
+        <li>Seguimiento de metas</li>
+        <li>Todos los 4 modos</li>
+        <li>3 días gratis</li>
+      </ul>
+      <div class="plan-btns">
+        <a href="https://www.paypal.com/paypalme/dylanincrease/89USD" class="plan-btn paypal" target="_blank">💙 PayPal</a>
+        <a href="https://link.mercadopago.com.mx/victorpay" class="plan-btn mp" target="_blank">🔵 Mercado Pago</a>
+      </div>
+      <p class="plan-trial">✓ 3 días gratis · Sin tarjeta</p>
+    </div>
+
+    <div class="plan-card">
+      <span class="plan-icon">🌿</span>
+      <h3>Bienestar</h3>
+      <div class="plan-price">$79<span>/mes</span></div>
+      <ul class="plan-features">
+        <li>Coach IA de bienestar</li>
+        <li>Monitor de estrés</li>
+        <li>Guías de meditación</li>
+        <li>Programa 30 días</li>
+        <li>Coach de motivación</li>
+        <li>3 días gratis</li>
+      </ul>
+      <div class="plan-btns">
+        <a href="https://www.paypal.com/paypalme/dylanincrease/79USD" class="plan-btn paypal" target="_blank">💙 PayPal</a>
+        <a href="https://link.mercadopago.com.mx/victorpay" class="plan-btn mp" target="_blank">🔵 Mercado Pago</a>
+      </div>
+      <p class="plan-trial">✓ 3 días gratis · Sin tarjeta</p>
+    </div>
   </div>
-</div>
+</section>
+
+<footer>
+  <p style="font-size:20px;font-family:'Syne',sans-serif;font-weight:800;color:var(--azul-c);margin-bottom:8px;">SYNCRO QUANTUM</p>
+  <p>Tu Coach IA Personal · Hecho para Latinoamérica</p>
+  <p style="margin-top:8px;">Contacto: <a href="https://wa.me/528444980359" style="color:var(--azul-c);">WhatsApp</a> · <a href="https://www.linkedin.com/in/victorhugomuñoz1486" style="color:var(--azul-c);">LinkedIn</a></p>
+  <p style="margin-top:16px;font-size:12px;color:rgba(133,183,235,0.5);">© 2026 Syncro Quantum · Victor Hugo Muñoz Medina · Todos los derechos reservados</p>
+</footer>
 
 <script>
-// ── AUTH ──────────────────────────────────────────
-const ADMIN_EMAIL='dylanincrease@gmail.com', ADMIN_PASS='syncro2025';
-let currentUser=null, passVisible=false;
-
-function togglePass(){
-  const i=document.getElementById('login-pass');
-  passVisible=!passVisible; i.type=passVisible?'text':'password';
-  document.getElementById('eye-btn').textContent=passVisible?'🙈':'👁';
-}
-function doLogin(){
-  const email=document.getElementById('login-email').value.trim().toLowerCase();
-  const pass=document.getElementById('login-pass').value;
-  const btn=document.getElementById('login-btn');
-  const err=document.getElementById('login-error');
-  err.style.display='none';
-  if(!email||!pass){showLoginError('COMPLETA TODOS LOS CAMPOS');return;}
-  btn.textContent='VERIFICANDO...';btn.style.opacity='.7';
-  setTimeout(()=>{
-    if(email===ADMIN_EMAIL.toLowerCase()&&pass===ADMIN_PASS){loginSuccess({email,name:'DYLAN',role:'admin'});}
-    else if(email!==ADMIN_EMAIL.toLowerCase()&&pass.length>=6){loginSuccess({email,name:email.split('@')[0].toUpperCase(),role:'user'});}
-    else{btn.textContent='⚡ INICIAR SESIÓN';btn.style.opacity='1';showLoginError('CREDENCIALES INCORRECTAS');}
-  },900);
-}
-function showLoginError(msg){const el=document.getElementById('login-error');el.textContent='⚠ '+msg;el.style.display='block';}
-function loginSuccess(user){
-  currentUser=user;
-  try{localStorage.setItem('sq_user',JSON.stringify(user));}catch(e){}
-  document.getElementById('login-btn').textContent='ACCESO CONCEDIDO ✓';
-  setTimeout(()=>{hideLogin();showApp(user);},400);
-}
-function showApp(user){
-  const app=document.getElementById('app');
-  app.classList.add('visible');
-  document.getElementById('user-chip').textContent=user.name.substring(0,2);
-  document.getElementById('profile-name').textContent=user.name;
-  document.getElementById('profile-email-display').textContent=user.email;
-  if(user.role==='admin'){document.getElementById('home-greeting').innerHTML=`BIENVENIDO, ${user.name} 👋<br><span style="background:linear-gradient(90deg,#00F5FF,#7C3AED,#FF006E);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TU SISTEMA CUÁNTICO.</span>`;}
-  goTab('home');
-}
-function hideLogin(){const ls=document.getElementById('login-screen');ls.classList.add('hidden');setTimeout(()=>ls.style.display='none',400);}
-function googleLogin(){showToast('GOOGLE AUTH PRÓXIMAMENTE');}
-function doLogout(){
-  try{localStorage.removeItem('sq_user');}catch(e){}
-  currentUser=null;
-  document.getElementById('app').classList.remove('visible');
-  const ls=document.getElementById('login-screen');
-  ls.style.display='flex';setTimeout(()=>ls.classList.remove('hidden'),50);
-  document.getElementById('login-email').value='';
-  document.getElementById('login-pass').value='';
-  document.getElementById('login-error').style.display='none';
-  document.getElementById('login-btn').textContent='⚡ INICIAR SESIÓN';
-  document.getElementById('login-btn').style.opacity='1';
-  showToast('SESIÓN TERMINADA');
-}
-document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-
-// ── NAVIGATION ────────────────────────────────────
-let currentTab='home';
-const tabColors={home:'#00F5FF',demos:'#FF006E',planes:'#00FF88',referidos:'#F59E0B',perfil:'#7C3AED'};
-function goTab(tab){
-  if(tab===currentTab)return;
-  document.getElementById('page-'+currentTab).classList.remove('active');
-  const ct=document.getElementById('tab-'+currentTab);
-  if(ct){ct.classList.remove('active');ct.querySelector('.tab-label').style.color='';ct.querySelector('.tab-line').style.opacity='0';}
-  currentTab=tab;
-  const np=document.getElementById('page-'+tab);np.classList.add('active');np.scrollTop=0;
-  const nt=document.getElementById('tab-'+tab);
-  if(nt){nt.classList.add('active');nt.querySelector('.tab-label').style.color=tabColors[tab];nt.querySelector('.tab-line').style.opacity='1';nt.querySelector('.tab-icon').style.transform='scale(1.18)';setTimeout(()=>nt.querySelector('.tab-icon').style.transform='scale(1)',200);}
-  const badge=document.getElementById('badge-'+tab);if(badge)badge.classList.remove('show');
-}
-let tX=0,tY=0;
-const tabs=['home','demos','planes','referidos','perfil'];
-document.getElementById('pages').addEventListener('touchstart',e=>{tX=e.touches[0].clientX;tY=e.touches[0].clientY;},{passive:true});
-document.getElementById('pages').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-tX,dy=e.changedTouches[0].clientY-tY;
-  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){const i=tabs.indexOf(currentTab);if(dx<0&&i<tabs.length-1)goTab(tabs[i+1]);else if(dx>0&&i>0)goTab(tabs[i-1]);}
-},{passive:true});
-
-// ── DEMOS ─────────────────────────────────────────
-function toggleDemo(id){
-  const el=document.getElementById(id),arrow=document.getElementById(id+'-arrow');
-  const isOpen=el.style.maxHeight&&el.style.maxHeight!=='0px';
-  ['d1','d2','d3'].forEach(d=>{document.getElementById(d).style.maxHeight='0px';const a=document.getElementById(d+'-arrow');if(a){a.style.transform='rotate(0deg)';a.style.color='';}});
-  if(!isOpen){el.style.maxHeight=el.scrollHeight+200+'px';arrow.style.transform='rotate(180deg)';arrow.style.color='#00F5FF';}
-}
-
-// ── UTILS ─────────────────────────────────────────
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function copyRef(){navigator.clipboard?.writeText('https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(()=>{});const btn=document.getElementById('refCopyBtn');btn.textContent='¡COPIADO ✓';btn.style.background='linear-gradient(135deg,#00FF88,#00F5FF)';showToast('🔗 LINK COPIADO ✓');setTimeout(()=>{btn.textContent='COPIAR';btn.style.background='linear-gradient(135deg,#7C3AED,#00F5FF)';},2500);}
-function shareWA(){window.open('https://wa.me/?text='+encodeURIComponent('🚀 Prueba SYNCRO QUANTUM gratis — el asistente de IA más avanzado. Usa mi link y los dos ganamos 1 mes gratis: https://syncroquantume.netlify.app/ref/TU-CODIGO'),'_blank');}
-function shareOther(btn){navigator.clipboard?.writeText('🚀 SYNCRO QUANTUM IA: https://syncroquantume.netlify.app/ref/TU-CODIGO').catch(()=>{});showToast('📋 TEXTO COPIADO ✓');const o=btn.innerHTML;btn.innerHTML='¡COPIADO ✓';setTimeout(()=>{btn.innerHTML=o;},2500);}
-function copyEnvCmds(btn){navigator.clipboard?.writeText('"Ok Google, activa modo concentración"\n"Alexa, pon temperatura a 20 grados"').catch(()=>{});showToast('📋 COMANDOS COPIADOS ✓');const o=btn.textContent;btn.textContent='¡COPIADO ✓';setTimeout(()=>btn.textContent=o,2500);}
-
-// ── MODAL ─────────────────────────────────────────
-const modals={
-  settings:`<div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:14px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">⚙ CONFIGURACIÓN</div><div style="display:flex;flex-direction:column;gap:0"><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,245,255,.07)"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">NOTIFICACIONES</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000;box-shadow:0 0 6px #00F5FF"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,245,255,.07)"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">BRIEFING 7AM</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#00FF88,#00F5FF);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000"></div></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:.3px">MODO OSCURO</span><div style="width:38px;height:20px;border-radius:4px;background:linear-gradient(135deg,#7C3AED,#FF006E);position:relative;cursor:pointer"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:3px;background:#000"></div></div></div></div><div style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(0,245,255,.07);font-size:9px;color:#0f172a;text-align:center;font-family:'Orbitron',sans-serif;letter-spacing:1px">SYNCRO QUANTUM v1.0 · © 2025</div>`,
-  privacy:`<div style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;margin-bottom:12px;letter-spacing:1px;background:linear-gradient(90deg,#00F5FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🔐 SEGURIDAD</div><div style="display:flex;flex-direction:column;gap:7px"><div style="padding:10px;background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00F5FF">CIFRADO E2E:</strong> Solo tú accedes.</div><div style="padding:10px;background:rgba(0,255,136,.02);border:1px solid rgba(0,255,136,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#00FF88">CERO VENTA:</strong> Tus datos nunca se comparten.</div><div style="padding:10px;background:rgba(124,58,237,.03);border:1px solid rgba(124,58,237,.1);border-radius:9px;font-size:11px;line-height:1.6;color:#94A3B8;font-family:'Orbitron',sans-serif;letter-spacing:.3px"><strong style="color:#7C3AED">BORRADO TOTAL:</strong> Elimina todo cuando quieras.</div></div>`
+const prompts = {
+  bienestar: `Eres el Coach de Bienestar de Syncro Quantum. Tu nombre es SQ Coach. Ayudas con estrés, sueño, energía y salud mental. Responde en español, de forma cálida y empática. Da consejos concretos. Máximo 4 oraciones. Termina con una pregunta de seguimiento. Nunca diagnostiques enfermedades.`,
+  productividad: `Eres el Coach de Productividad de Syncro Quantum. Tu nombre es SQ Coach. Ayudas con organización, tiempo y metas. Conoces Pomodoro, GTD, Time Blocking. Responde en español, de forma directa y energética. Máximo 4 oraciones. Termina con UNA acción concreta para HOY.`,
+  finanzas: `Eres el Coach Financiero de Syncro Quantum. Tu nombre es SQ Coach. Ayudas a mexicanos y latinoamericanos con ahorro, presupuesto y deudas. Conoces la regla 50-30-20, fondo de emergencia y método bola de nieve. Responde en español, honesto y práctico. Máximo 4 oraciones. Termina con un paso aplicable esta semana.`,
+  motivacion: `Eres el Coach de Motivación de Syncro Quantum. Tu nombre es SQ Coach. Ayudas a superar miedos, bloqueos y falta de confianza. Responde en español, con energía genuina. NUNCA uses frases vacías o clichés. Conecta directo con la situación del usuario. Máximo 4 oraciones. Termina con una afirmación personalizada o reto pequeño.`
 };
-function openModal(type){document.getElementById('modal-content').innerHTML=modals[type]||'';document.getElementById('modal-overlay').classList.add('open');}
-function closeModal(e){if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');}
 
-// ── PWA ───────────────────────────────────────────
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
-function installApp(){
-  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast('✅ APP INSTALADA');deferredPrompt=null;});}
-  else{showToast('ABRE EN CHROME PARA INSTALAR');}
+const chips = {
+  bienestar: ['Me siento estresado','No puedo dormir bien','Me falta energía','Cómo manejar la ansiedad'],
+  productividad: ['Cómo organizo mi día','Tengo demasiadas tareas','Me distraigo mucho','Cómo cumplir mis metas'],
+  finanzas: ['Cómo empezar a ahorrar','Tengo muchas deudas','Cómo hacer un presupuesto','Gasto más de lo que gano'],
+  motivacion: ['Necesito motivación','Me siento bloqueado','Tengo miedo de fracasar','Cómo creer en mí mismo']
+};
+
+let mode = 'bienestar';
+let history = [];
+
+function setMode(m, btn) {
+  mode = m; history = [];
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = `<div class="msg-b"><span class="tag">SQ COACH · ${m.toUpperCase()}</span>Modo ${m.charAt(0).toUpperCase()+m.slice(1)} activado. Estoy listo para apoyarte. ¿Qué tienes en mente?</div>`;
+  const ch = document.getElementById('chips');
+  ch.innerHTML = chips[m].map(c => `<button class="chip" onclick="useChip(this)">${c}</button>`).join('');
 }
 
-// ── SERVICE WORKER ────────────────────────────────
-let swReg=null;
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').then(reg=>{
-    swReg=reg;
-    reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)document.getElementById('update-banner').classList.add('show');});});
-    setInterval(()=>reg.update(),30*60*1000);
-  }).catch(()=>{});
-}
-function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});showToast('🔄 ACTUALIZANDO...');setTimeout(()=>location.reload(),800);}
-navigator.serviceWorker?.addEventListener('controllerchange',()=>location.reload());
+function useChip(btn) { document.getElementById('input').value = btn.textContent; send(); }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
 
-// ── BOOT ──────────────────────────────────────────
-window.addEventListener('load',()=>{
-  let p=0;
-  const bar=document.getElementById('lbar'),txt=document.getElementById('ltxt');
-  const msgs=['INICIANDO...','CARGANDO IA...','CALIBRANDO...','LISTO'];
-  let mi=0;
-  const iv=setInterval(()=>{
-    p+=Math.random()*18+6;if(p>=100){p=100;clearInterval(iv);}
-    bar.style.width=p+'%';
-    if(p>mi*30&&mi<msgs.length)txt.textContent=msgs[mi++];
-  },100);
-  setTimeout(()=>{
-    let saved=null;try{const s=localStorage.getItem('sq_user');if(s)saved=JSON.parse(s);}catch(e){}
-    const splash=document.getElementById('splash');
-    splash.classList.add('hidden');setTimeout(()=>splash.style.display='none',400);
-    if(saved){currentUser=saved;showApp(saved);}
-    else{const ls=document.getElementById('login-screen');ls.style.display='flex';setTimeout(()=>ls.classList.remove('hidden'),50);}
-  },2400);
-});
+function addMsg(text, isUser) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = isUser ? 'msg-u' : 'msg-b';
+  if(!isUser) div.innerHTML = `<span class="tag">SQ COACH · ${mode.toUpperCase()}</span>${text}`;
+  else div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg-b'; div.id = 'typing';
+  div.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function send() {
+  const inp = document.getElementById('input');
+  const text = inp.value.trim();
+  if(!text) return;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true; inp.value = '';
+  addMsg(text, true);
+  history.push({role:'user', content:text});
+  showTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: prompts[mode],
+        messages: history
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Hubo un error. Intenta de nuevo.';
+    document.getElementById('typing')?.remove();
+    addMsg(reply, false);
+    history.push({role:'assistant', content:reply});
+  } catch(e) {
+    document.getElementById('typing')?.remove();
+    addMsg('Error de conexión. Intenta de nuevo.', false);
+  }
+  btn.disabled = false;
+  inp.focus();
+}
 </script>
 </body>
 </html>
